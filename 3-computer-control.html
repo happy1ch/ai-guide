@@ -1,0 +1,270 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>:root{color-scheme:light}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>내 컴퓨터 제어하기</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Do+Hyeon&family=Noto+Sans+KR:wght@400;500;700&display=swap">
+<style>
+/* Layout: 탭(Claude Code/Antigravity). 각 탭은 손이 닿는 범위 → 시작 → 예시 요청 → 권한 단계 → 안전 수칙 */
+:root{
+  --bg:#f2f6f8; --surface:#ffffff; --fg:#13212c; --muted:#556675; --line:#d6e0e6;
+  --accent:#d9631e; --accent-soft:#fbe6d6; --accent-fg:#ffffff;
+  --claude:#d9631e; --claude-soft:#fbe6d6;
+  --anti:#2b66d9; --anti-soft:#dde8fb; --cdx:#0b8a68; --cdx-soft:#d8f1e7;
+  --warn:#b4372b; --warn-soft:#fbe3df;
+  --ok:#1f7a4d; --ok-soft:#dcf1e5;
+  --font-display:'Do Hyeon','Noto Sans KR',sans-serif;
+  --font-body:'Noto Sans KR',system-ui,sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0e171e; --surface:#16232d; --fg:#e8eff3; --muted:#9fb0bc; --line:#26384a;
+  --accent:#f09a62; --accent-soft:#3d2a1c; --accent-fg:#1b1008;
+  --claude:#f09a62; --claude-soft:#3d2a1c; --anti:#7aa7ff; --anti-soft:#1b2b4a; --cdx:#4fd1a5; --cdx-soft:#123d30;
+  --warn:#f08a7e; --warn-soft:#3f2420; --ok:#6fd3a0; --ok-soft:#173a2a; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0e171e; --surface:#16232d; --fg:#e8eff3; --muted:#9fb0bc; --line:#26384a;
+  --accent:#f09a62; --accent-soft:#3d2a1c; --accent-fg:#1b1008;
+  --claude:#f09a62; --claude-soft:#3d2a1c; --anti:#7aa7ff; --anti-soft:#1b2b4a; --cdx:#4fd1a5; --cdx-soft:#123d30;
+  --warn:#f08a7e; --warn-soft:#3f2420; --ok:#6fd3a0; --ok-soft:#173a2a; color-scheme:dark}
+:root[data-who="claude"]{--accent:var(--claude);--accent-soft:var(--claude-soft)}
+:root[data-who="anti"]{--accent:var(--anti);--accent-soft:var(--anti-soft)}
+:root[data-who="cdx"]{--accent:var(--cdx);--accent-soft:var(--cdx-soft)}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font:16px/1.75 var(--font-body);
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0 56px}
+.wrap{max-width:980px;margin:0 auto}
+h1,h2,h3{font-family:var(--font-display);font-weight:400;text-wrap:balance;line-height:1.3;margin:0}
+h1{font-size:clamp(32px,6vw,52px)}
+h2{font-size:clamp(25px,4vw,32px);margin-bottom:6px}
+h3{font-size:20px}
+p{margin:0 0 10px}
+section{margin-top:56px}
+.lead{color:var(--muted);max-width:62ch}
+.eyebrow{font-size:13px;letter-spacing:.12em;color:var(--accent);font-weight:700}
+header{padding-block:44px 0}
+header p{color:var(--muted);font-size:18px;max-width:54ch;margin-top:12px}
+.tabs{display:flex;gap:8px;margin-top:28px;flex-wrap:wrap}
+.tab{font:inherit;font-weight:700;font-size:17px;padding:10px 22px;border-radius:99px;border:2px solid var(--line);background:var(--surface);color:var(--muted);cursor:pointer}
+.tab[aria-selected="true"]{color:var(--accent-fg);border-color:var(--accent);background:var(--accent)}
+.tab:focus-visible,.copy:focus-visible{outline:3px solid var(--fg);outline-offset:2px}
+
+.hero-fig{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px;margin-top:28px;overflow-x:auto}
+.hero-fig svg{display:block;width:100%;min-width:560px;height:auto}
+
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:18px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:18px;min-width:0}
+.card p{color:var(--muted);font-size:15px;margin:6px 0 0}
+.n{display:inline-grid;place-items:center;width:30px;height:30px;border-radius:50%;background:var(--accent);color:var(--accent-fg);font-weight:700;margin-bottom:8px}
+.ico{width:48px;height:48px;border-radius:12px;background:var(--accent-soft);display:grid;place-items:center;margin-bottom:8px}
+.ico svg{width:28px;height:28px;stroke:var(--accent);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+@media(max-width:760px){.grid3{grid-template-columns:1fr}}
+
+.feats{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;margin-top:18px}
+.feat{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:20px;min-width:0;display:flex;flex-direction:column;gap:8px}
+.feat p{color:var(--muted);margin:0;font-size:15px}
+.ex{margin-top:auto;background:var(--accent-soft);border-radius:10px;padding:12px 14px;font-size:14px;line-height:1.6}
+.ex small{display:block;font-weight:700;color:var(--accent);margin-bottom:2px;font-size:12px;letter-spacing:.06em}
+.copy{margin-top:8px;font:inherit;font-size:13px;font-weight:700;border:1.5px solid var(--accent);color:var(--accent);background:transparent;border-radius:8px;padding:2px 12px;cursor:pointer}
+@media(max-width:700px){.feats{grid-template-columns:1fr}}
+
+.ladder{display:grid;gap:10px;margin-top:18px}
+.rung{display:grid;grid-template-columns:150px 1fr auto;gap:14px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px 16px}
+.rung b{font-size:16px}
+.rung span{color:var(--muted);font-size:15px;min-width:0}
+.pill{font-size:12px;font-weight:700;padding:2px 10px;border-radius:99px;white-space:nowrap}
+.pill.safe{background:var(--ok-soft);color:var(--ok)}
+.pill.mid{background:var(--accent-soft);color:var(--accent)}
+.pill.risk{background:var(--warn-soft);color:var(--warn)}
+@media(max-width:700px){.rung{grid-template-columns:1fr;gap:4px}.rung .pill{justify-self:start}}
+
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:18px}
+.box{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:20px;min-width:0}
+.box.warn{background:var(--warn-soft);border-color:transparent}
+.box.warn h3{color:var(--warn)}
+.box ul{margin:10px 0 0;padding-left:20px}
+.box li{margin-bottom:6px}
+@media(max-width:700px){.cols{grid-template-columns:1fr}}
+footer{margin-top:48px;font-size:13px;color:var(--muted);border-top:1px solid var(--line);padding-top:16px}
+</style>
+
+<div class="wrap">
+<header>
+  <div class="eyebrow">AI에게 손을 달아 주기</div>
+  <h1>Claude Code, Antigravity, Codex로<br>내 컴퓨터 제어하기</h1>
+  <p>채팅 AI는 말만 합니다. 이 도구들은 내 컴퓨터의 파일을 열고, 명령을 실행하고, 브라우저를 직접 움직입니다. 그래서 더 유용하고, 그래서 안전 규칙이 중요합니다.</p>
+  <div class="tabs" role="tablist" aria-label="도구 선택">
+    <button class="tab" role="tab" id="tab-claude" data-who="claude" aria-selected="true">Claude Code</button>
+    <button class="tab" role="tab" id="tab-anti" data-who="anti" aria-selected="false">Antigravity</button>
+    <button class="tab" role="tab" id="tab-cdx" data-who="cdx" aria-selected="false">Codex</button>
+  </div>
+</header>
+
+<div class="hero-fig">
+  <svg viewBox="0 0 640 170" role="img" aria-label="채팅 AI는 말만 하고, 에이전트 도구는 파일, 터미널, 브라우저, 화면까지 손이 닿는다는 그림">
+    <rect x="8" y="30" width="130" height="110" rx="14" fill="var(--surface)" stroke="var(--line)" stroke-width="2"/>
+    <text x="73" y="22" text-anchor="middle" font-size="14" font-weight="700" fill="var(--muted)" font-family="Noto Sans KR, sans-serif">채팅 AI</text>
+    <rect x="24" y="52" width="84" height="22" rx="10" fill="var(--accent-soft)"/><rect x="38" y="84" width="84" height="22" rx="10" fill="var(--line)"/>
+    <text x="73" y="128" text-anchor="middle" font-size="12" fill="var(--muted)" font-family="Noto Sans KR, sans-serif">말로 답만 함</text>
+    <path d="M150 85h40m-8-8l8 8-8 8" stroke="var(--accent)" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+    <g font-family="Noto Sans KR, sans-serif" font-size="13" font-weight="700" fill="var(--fg)" text-anchor="middle">
+      <rect x="205" y="30" width="105" height="110" rx="14" fill="var(--accent-soft)" stroke="var(--accent)" stroke-width="2"/>
+      <path d="M232 70h40l-4-8h-32z M230 70v28h44V70" fill="none" stroke="var(--accent)" stroke-width="3" stroke-linejoin="round"/>
+      <text x="257" y="126">파일</text>
+      <rect x="322" y="30" width="105" height="110" rx="14" fill="var(--accent-soft)" stroke="var(--accent)" stroke-width="2"/>
+      <path d="M345 62l16 12-16 12M370 90h26" fill="none" stroke="var(--accent)" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+      <text x="374" y="126">터미널(명령)</text>
+      <rect x="439" y="30" width="95" height="110" rx="14" fill="var(--accent-soft)" stroke="var(--accent)" stroke-width="2"/>
+      <circle cx="486" cy="78" r="22" fill="none" stroke="var(--accent)" stroke-width="3"/><path d="M464 78h44M486 56c-10 12-10 32 0 44M486 56c10 12 10 32 0 44" fill="none" stroke="var(--accent)" stroke-width="2"/>
+      <text x="486" y="126">브라우저</text>
+      <rect x="546" y="30" width="86" height="110" rx="14" fill="var(--accent-soft)" stroke="var(--accent)" stroke-width="2"/>
+      <rect x="560" y="60" width="58" height="38" rx="5" fill="none" stroke="var(--accent)" stroke-width="3"/><path d="M582 108h14" stroke="var(--accent)" stroke-width="3"/>
+      <text x="589" y="126">화면</text>
+    </g>
+    <text x="420" y="18" text-anchor="middle" font-size="14" font-weight="700" fill="var(--accent)" font-family="Noto Sans KR, sans-serif">에이전트 도구: 손이 닿는 범위</text>
+  </svg>
+</div>
+
+<main id="out"></main>
+
+<footer>
+  기능 이름, 메뉴 위치, 권한 설정 화면은 버전마다 달라질 수 있습니다. 처음에는 중요하지 않은 연습용 폴더에서 시도하고, 중요한 자료는 반드시 따로 백업해 두세요.
+</footer>
+</div>
+
+<script>
+var ICONS={
+  folder:'<path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>',
+  term:'<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 10l3 2-3 2M12 15h5"/>',
+  globe:'<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c-4 4-4 14 0 18M12 3c4 4 4 14 0 18"/>',
+  screen:'<rect x="3" y="4" width="18" height="12" rx="2"/><path d="M9 20h6M12 16v4"/>'
+};
+function ico(k){return '<div class="ico"><svg viewBox="0 0 24 24" aria-hidden="true">'+ICONS[k]+'</svg></div>'}
+
+var DATA={
+claude:{
+  title:'Claude Code: 내 폴더에서 일하는 조수',
+  lead:'Claude Code는 내가 정한 작업 폴더 안에서 파일을 읽고 고치고, 명령을 실행합니다. 데스크톱 앱의 Code 탭이나 터미널에서 쓰며, 하는 일마다 허락을 받는 방식이 기본입니다.',
+  reach:[
+    ['folder','파일','작업 폴더의 파일을 읽고, 새로 만들고, 고칩니다. 폴더 정리, 문서 합치기, 이름 일괄 변경에 씁니다.'],
+    ['term','터미널 명령','프로그램 실행, 파일 이동, 변환 같은 명령을 대신 입력합니다. 실행 전에 보여 주고 허락을 받습니다.'],
+    ['globe','브라우저','화면에 페이지를 띄워 보며 만든 웹페이지를 직접 눌러 확인합니다.'],
+    ['screen','화면 제어','허용한 앱에 한해 화면을 보고 클릭, 입력까지 합니다. 앱마다 따로 허락해야 합니다.']
+  ],
+  steps:[
+    ['설치하고 로그인','데스크톱 앱의 Code 탭을 쓰거나, 터미널에서 claude를 실행합니다. 프로 요금제 계정으로 로그인합니다.'],
+    ['작업 폴더 고르기','AI가 다룰 폴더 하나를 정합니다. 연습은 새 폴더에서 시작하세요.'],
+    ['권한 단계 정하기','처음에는 "매번 묻기"로 시작합니다. 익숙해지면 "편집만 자동"으로 올립니다.']
+  ],
+  ex:[
+    ['계획부터 받기','큰 작업은 실행하지 말고 계획만 쓰게 합니다.','이 폴더의 사진을 날짜별 폴더로 정리하려고 해. 실행하지 말고 어떻게 옮길지 계획과 예상 결과만 보여 줘.'],
+    ['현황 파악','지우지 않고 읽기만 하는 요청은 가장 안전합니다.','이 드라이브에서 용량이 큰 폴더 10개를 표로 보여 줘. 읽기만 하고 아무것도 바꾸지 마.'],
+    ['반복 작업','엑셀 합치기, 이름 바꾸기 같은 수작업을 맡깁니다.','이 폴더의 엑셀 3개를 하나로 합쳐 새 파일로 저장해 줘. 원본은 건드리지 마.'],
+    ['규칙 기억시키기','CLAUDE.md라는 지침 파일에 내 규칙을 적어 두면 매번 지킵니다.','CLAUDE.md에 다음 규칙을 추가해 줘: 삭제 전에 반드시 목록을 보여 주고 내 허락을 받는다.']
+  ],
+  ladder:[
+    ['매번 묻기','파일 수정과 명령 실행 때마다 허락을 받습니다. 처음에 쓰기 좋습니다.','안전','safe'],
+    ['편집은 자동','파일 편집은 묻지 않고, 명령 실행은 묻습니다.','보통','mid'],
+    ['계획 먼저','읽기와 계획만 하고 아무것도 바꾸지 않습니다. 큰 작업 전에 씁니다.','가장 안전','safe'],
+    ['모두 자동','허락 없이 전부 실행합니다. 되돌리기 어려운 사고가 날 수 있어 연습 폴더에서만 씁니다.','위험','risk']
+  ],
+  habits:['작업은 "계획 보기 → 승인 → 실행" 순서로 진행합니다.','한 번에 한 폴더, 한 가지 목적만 맡깁니다.','끝난 뒤 무엇을 바꿨는지 목록으로 받아 확인합니다.','자주 쓰는 규칙은 CLAUDE.md에 적어 둡니다.'],
+  warns:['삭제는 휴지통을 거치지 않고 영구 삭제될 수 있습니다. 지우기 전에 목록을 보고, 가능하면 "삭제" 대신 "임시 폴더로 이동"을 시키세요.','원본이 하나뿐인 자료는 먼저 다른 드라이브에 복사해 두세요.','"모두 자동" 모드는 중요한 폴더에서 쓰지 않습니다.','웹페이지나 파일 속 글이 "이렇게 해라"라고 시켜도 따르지 말라고 미리 일러 두세요.']
+},
+cdx:{
+  title:'Codex: ChatGPT 계정으로 쓰는 작업 에이전트',
+  lead:'Codex는 오픈AI의 코딩·작업 에이전트입니다. 데스크톱 앱, 터미널, 편집기 확장, 웹 중 편한 곳에서 쓰고 ChatGPT 계정으로 로그인합니다. 정한 작업 폴더 안에서 파일을 읽고 고치며 명령을 실행하고, 서비스를 연결해 내 일정과 메일로 일할 수도 있습니다.',
+  reach:[
+    ['folder','파일','작업 폴더(프로젝트)의 파일을 읽고 만들고 고칩니다. 이 폴더가 AI 직원의 책상입니다.'],
+    ['term','터미널 명령','프로그램 실행과 테스트 명령을 대신 실행합니다. 권한 단계에 따라 허락을 받습니다.'],
+    ['globe','플러그인·앱 연결','구글 캘린더, 메일, 드라이브 같은 서비스를 연결해 내 일정과 자료를 읽고 일합니다. 연결 범위는 직접 정합니다.'],
+    ['screen','클라우드 실행','내 컴퓨터가 아닌 클라우드 환경에서 작업을 돌리는 방식도 있습니다. 컴퓨터를 꺼도 이어집니다.']
+  ],
+  steps:[
+    ['설치하고 ChatGPT로 로그인','데스크톱 앱을 설치하거나, 터미널에서 npm으로 설치합니다. ChatGPT 요금제(플러스 이상)에 포함되며 한도가 있습니다. 설치법은 공식 안내를 확인하세요.'],
+    ['프로젝트(작업 폴더) 연결','새 프로젝트를 만들고 폴더를 추가합니다. 연습은 바탕화면의 새 폴더에서 시작하세요.'],
+    ['권한 단계 정하기','처음에는 읽기 전용이나 계획 모드로 시작합니다. 익숙해지면 작업 폴더 안에서만 자동으로 일하게 합니다.']
+  ],
+  ex:[
+    ['계획 모드로 시작','입력창의 ＋ 버튼에서 계획 모드를 켜면 바로 실행하지 않고 질문과 계획을 먼저 보여 줍니다.','계획 모드로 해 줘. 이 폴더의 파일을 정리하려고 해. 실행하지 말고 필요한 질문을 먼저 하고, 구축 계획만 보여 줘.'],
+    ['지침 파일 만들기','AGENTS.md라는 지침 파일에 규칙을 적어 두면 매번 지킵니다. Claude의 CLAUDE.md와 같은 역할입니다.','AGENTS.md에 다음 규칙을 추가해 줘: 기존 파일은 함부로 삭제하지 않는다. 최종 결과 전에 반드시 검토한다. 모르는 정보는 만들어 내지 않는다.'],
+    ['현황 파악','읽기만 하는 요청은 가장 안전합니다.','이 폴더의 파일 구조를 표로 보여 줘. 읽기만 하고 아무것도 바꾸지 마.'],
+    ['오류 고치기','오류가 나면 화면을 캡처해 붙이고 상황을 알려 주면 원인을 찾아 고칩니다.','(오류 화면 캡처 첨부) 로그인 버튼을 누르면 이런 오류가 나. 원인을 찾고, 고치기 전에 무엇을 바꿀지 먼저 알려 줘.']
+  ],
+  ladder:[
+    ['읽기 전용','파일을 읽기만 하고 아무것도 바꾸지 않습니다. 처음에 쓰기 좋습니다.','가장 안전','safe'],
+    ['계획 모드','질문과 계획만 만들고 내가 승인하면 실행합니다. 큰 작업 전에 씁니다.','안전','safe'],
+    ['작업 폴더 안에서 자동','연결한 폴더 안의 편집과 명령은 묻지 않고 실행합니다. 폴더 밖이나 인터넷은 허락을 받습니다.','보통','mid'],
+    ['전체 접근','허락 없이 컴퓨터 전체에 접근합니다. 되돌리기 어려운 사고가 날 수 있어 연습 환경에서만 씁니다.','위험','risk']
+  ],
+  habits:['"계획 모드로 시작 → 계획 전체 읽기 → 수정 요청 → 실행" 순서를 지킵니다.','계획이 나오면 내가 고른 조건이 제대로 반영됐는지 펼쳐서 읽습니다.','오류는 혼자 고민하지 말고 캡처를 붙여 그대로 보여 줍니다.','처음에는 일정 확인이나 브리핑처럼 읽기 위주의 작은 일 하나부터 만듭니다.'],
+  warns:['구글 메일과 드라이브를 연결하면 개인 자료를 읽게 됩니다. 승인 화면의 권한 목록을 읽고 필요한 범위만 허용하세요.','삭제는 휴지통을 거치지 않고 영구 삭제될 수 있습니다. 지우기 전에 목록을 보여 달라고 하세요.','원본이 하나뿐인 자료는 먼저 다른 드라이브에 복사해 두세요.','클라우드 실행에는 내 파일이 인터넷 환경으로 올라갑니다. 민감한 자료는 올리지 마세요.']
+},
+anti:{
+  title:'Antigravity: AI 일꾼들을 지휘하는 작업실',
+  lead:'Antigravity는 구글의 AI 개발 작업 환경입니다. 코드 편집기에 더해, 여러 AI 에이전트에게 일을 나눠 맡기고 진행 상황을 한 화면에서 볼 수 있습니다. 구글 계정으로 시작합니다.',
+  reach:[
+    ['folder','파일','연 폴더 안의 파일을 읽고 만들고 고칩니다. 에디터에서 AI가 바꾼 부분을 바로 확인합니다.'],
+    ['term','터미널 명령','프로그램 설치, 실행, 테스트 명령을 대신 실행합니다. 자동 실행 범위를 설정으로 정합니다.'],
+    ['globe','브라우저 에이전트','크롬 확장을 설치하면 AI가 웹페이지를 열고 누르고 입력하며, 화면 캡처로 결과를 보여 줍니다.'],
+    ['screen','결과물 확인','계획서, 화면 캡처, 작업 기록(아티팩트)으로 AI가 한 일을 눈으로 검수합니다.']
+  ],
+  steps:[
+    ['설치하고 구글 로그인','Antigravity를 설치하고 구글 계정으로 로그인합니다. 처음 설정에서 사용 방식을 고릅니다.'],
+    ['폴더 열기','작업할 폴더를 엽니다. AI가 만지는 범위가 이 폴더 안으로 한정됩니다.'],
+    ['실행 정책 정하기','터미널 명령을 "매번 검토 요청"으로 두는 것부터 시작하세요. 자동 실행은 익숙해진 뒤에 허용합니다.']
+  ],
+  ex:[
+    ['계획서 받기','먼저 계획을 쓰게 하고 읽고 승인합니다.','이 폴더의 파일 구조를 분석하고, 정리 계획서를 먼저 작성해 줘. 내가 승인하기 전에는 파일을 옮기지 마.'],
+    ['웹 자료 모으기','브라우저 에이전트에게 사이트 확인을 시킵니다.','브라우저에서 이 사이트를 열어 최근 공지 5개의 제목과 날짜를 표로 정리해 줘. 로그인이나 입력은 하지 마.'],
+    ['앱 만들고 확인','만든 화면을 AI가 직접 열어 눌러 보게 합니다.','간단한 헌금 기록 웹페이지를 만들고, 브라우저로 열어서 입력과 합계가 잘 되는지 직접 확인해서 캡처로 보여 줘.'],
+    ['규칙 정하기','작업 규칙을 파일로 적어 두면 에이전트가 따릅니다.','이 프로젝트의 규칙을 정리해 줘: 삭제는 항상 확인을 받고, 한국어로 설명한다.']
+  ],
+  ladder:[
+    ['검토 요청','터미널 명령을 실행하기 전에 내 허락을 받습니다. 처음에 권장합니다.','안전','safe'],
+    ['목록 기반 자동','미리 허용한 명령만 자동으로 실행하고 나머지는 묻습니다.','보통','mid'],
+    ['계획 후 승인','계획서를 먼저 받아 읽고 승인한 뒤에 실행하게 합니다.','안전','safe'],
+    ['항상 자동','모든 명령을 허락 없이 실행합니다. 중요한 폴더에서는 피합니다.','위험','risk']
+  ],
+  habits:['에이전트마다 하나의 목적만 줍니다. 일을 나누면 결과를 검수하기 쉽습니다.','결과물(계획서, 캡처)을 읽고 나서 승인합니다.','웹 작업은 읽기 전용으로 시작합니다. 로그인과 결제는 맡기지 않습니다.','연습용 폴더에서 며칠 써 보고 허용 범위를 넓힙니다.'],
+  warns:['브라우저 에이전트에게 비밀번호, 카드번호, 은행 화면을 맡기지 마세요.','웹페이지 안에 숨은 지시문이 AI를 속일 수 있습니다. 모르는 사이트는 읽기만 시키세요.','터미널 자동 실행을 켜면 삭제 명령도 실행될 수 있습니다. 중요한 폴더에서는 켜지 마세요.','실험적 도구라서 기능과 한도가 자주 바뀝니다. 중요한 작업 전에 백업부터 하세요.']
+}};
+
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;')}
+function render(who){
+  var d=DATA[who],h='';
+  h+='<section><div class="eyebrow">'+({claude:'CLAUDE CODE',anti:'ANTIGRAVITY',cdx:'CODEX'})[who]+'</div><h2>'+d.title+'</h2><p class="lead">'+d.lead+'</p>';
+  h+='<div class="grid3" style="grid-template-columns:repeat(auto-fit,minmax(200px,1fr))">';
+  d.reach.forEach(function(r){h+='<div class="card">'+ico(r[0])+'<h3>'+r[1]+'</h3><p>'+r[2]+'</p></div>'});
+  h+='</div></section>';
+  h+='<section><h2>시작은 세 단계</h2><div class="grid3">';
+  d.steps.forEach(function(s,i){h+='<div class="card"><span class="n">'+(i+1)+'</span><h3>'+s[0]+'</h3><p>'+s[1]+'</p></div>'});
+  h+='</div></section>';
+  h+='<section><h2>이런 요청부터 해 보세요</h2><p class="lead">모두 읽기나 계획 위주라 처음 시도해도 안전한 요청입니다. 복사해서 고쳐 쓰세요.</p><div class="feats">';
+  d.ex.forEach(function(f,i){h+='<div class="feat"><h3>'+f[0]+'</h3><p>'+f[1]+'</p><div class="ex"><small>요청 예시</small><span id="ex-'+who+i+'">'+esc(f[2])+'</span><br><button class="copy" data-t="ex-'+who+i+'">복사</button></div></div>'});
+  h+='</div></section>';
+  h+='<section><h2>권한 단계: 얼마나 맡길까</h2><p class="lead">AI에게 주는 자유도가 클수록 편하지만 사고도 커집니다.</p><div class="ladder">';
+  d.ladder.forEach(function(l){h+='<div class="rung"><b>'+l[0]+'</b><span>'+l[1]+'</span><span class="pill '+l[3]+'">'+l[2]+'</span></div>'});
+  h+='</div></section>';
+  h+='<section><div class="cols"><div class="box"><h3>이렇게 쓰면 좋습니다</h3><ul>'+d.habits.map(function(x){return '<li>'+x+'</li>'}).join('')+'</ul></div>'
+    +'<div class="box warn"><h3>반드시 지킬 안전 수칙</h3><ul>'+d.warns.map(function(x){return '<li>'+x+'</li>'}).join('')+'</ul></div></div></section>';
+  document.getElementById('out').innerHTML=h;
+}
+function pick(who){
+  document.documentElement.setAttribute('data-who',who);
+  ['claude','anti','cdx'].forEach(function(k){document.getElementById('tab-'+k).setAttribute('aria-selected',k===who?'true':'false')});
+  render(who);
+  try{history.replaceState(null,'','#'+who)}catch(e){}
+}
+document.querySelectorAll('.tab').forEach(function(b){b.addEventListener('click',function(){pick(b.dataset.who)})});
+document.getElementById('out').addEventListener('click',function(e){
+  var b=e.target.closest('.copy'); if(!b)return;
+  var el=document.getElementById(b.dataset.t),txt=el.textContent;
+  function done(){b.textContent='복사됨';setTimeout(function(){b.textContent='복사'},1500)}
+  function fallback(){var r=document.createRange();r.selectNodeContents(el);var s=getSelection();s.removeAllRanges();s.addRange(r);b.textContent='선택됨 (Ctrl+C)'}
+  try{navigator.clipboard.writeText(txt).then(done,fallback)}catch(err){fallback()}
+});
+function fromHash(){return location.hash==='#anti'?'anti':(location.hash==='#cdx'?'cdx':'claude')}
+window.addEventListener('hashchange',function(){pick(fromHash())});
+pick(fromHash());
+</script>
+
+</html>

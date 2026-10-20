@@ -1,0 +1,363 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>:root{color-scheme:light}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>Claude·Gemini 화면 안내</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Do+Hyeon&family=Noto+Sans+KR:wght@400;500;700&display=swap">
+<style>
+/* Layout: 탭(Claude/Gemini). 번호 표시가 붙은 화면 도식 + 번호별 설명 → 사용량 → 결과물 패널 → 사용자 지정 → 이름 대응표 */
+:root{
+  --bg:#f2f6f8; --surface:#ffffff; --side:#eaf0f4; --fg:#13212c; --muted:#556675; --line:#d6e0e6;
+  --accent:#d9631e; --accent-soft:#fbe6d6; --accent-fg:#ffffff;
+  --claude:#d9631e; --claude-soft:#fbe6d6; --gem:#2b66d9; --gem-soft:#dde8fb; --gpt:#0b8a68; --gpt-soft:#d8f1e7;
+  --mark:#13212c; --mark-fg:#ffffff; --on:#c0392b;
+  --ok:#1f7a4d; --ok-soft:#dcf1e5; --warn:#b4372b; --warn-soft:#fbe3df;
+  --font-display:'Do Hyeon','Noto Sans KR',sans-serif;
+  --font-body:'Noto Sans KR',system-ui,sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0e171e; --surface:#16232d; --side:#101c25; --fg:#e8eff3; --muted:#9fb0bc; --line:#26384a;
+  --accent:#f09a62; --accent-soft:#3d2a1c; --accent-fg:#1b1008;
+  --claude:#f09a62; --claude-soft:#3d2a1c; --gem:#7aa7ff; --gem-soft:#1b2b4a; --gpt:#4fd1a5; --gpt-soft:#123d30;
+  --mark:#e8eff3; --mark-fg:#0e171e; --on:#ff7a68;
+  --ok:#6fd3a0; --ok-soft:#173a2a; --warn:#f08a7e; --warn-soft:#3f2420; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0e171e; --surface:#16232d; --side:#101c25; --fg:#e8eff3; --muted:#9fb0bc; --line:#26384a;
+  --accent:#f09a62; --accent-soft:#3d2a1c; --accent-fg:#1b1008;
+  --claude:#f09a62; --claude-soft:#3d2a1c; --gem:#7aa7ff; --gem-soft:#1b2b4a; --gpt:#4fd1a5; --gpt-soft:#123d30;
+  --mark:#e8eff3; --mark-fg:#0e171e; --on:#ff7a68;
+  --ok:#6fd3a0; --ok-soft:#173a2a; --warn:#f08a7e; --warn-soft:#3f2420; color-scheme:dark}
+:root[data-who="claude"]{--accent:var(--claude);--accent-soft:var(--claude-soft)}
+:root[data-who="gem"]{--accent:var(--gem);--accent-soft:var(--gem-soft)}
+:root[data-who="gpt"]{--accent:var(--gpt);--accent-soft:var(--gpt-soft)}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font:16px/1.75 var(--font-body);
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0 56px}
+.wrap{max-width:1000px;margin:0 auto}
+h1,h2,h3{font-family:var(--font-display);font-weight:400;text-wrap:balance;line-height:1.3;margin:0}
+h1{font-size:clamp(32px,6vw,52px)}
+h2{font-size:clamp(25px,4vw,32px);margin-bottom:6px}
+h3{font-size:20px}
+p{margin:0 0 10px}
+section{margin-top:56px}
+.lead{color:var(--muted);max-width:64ch}
+.eyebrow{font-size:13px;letter-spacing:.12em;color:var(--accent);font-weight:700}
+header{padding-block:44px 0}
+header p{color:var(--muted);font-size:18px;max-width:56ch;margin-top:12px}
+.tabs,.seg{display:flex;gap:8px;flex-wrap:wrap}
+.tabs{margin-top:28px}
+.tab,.segb{font:inherit;font-weight:700;padding:9px 22px;border-radius:99px;border:2px solid var(--line);background:var(--surface);color:var(--muted);cursor:pointer;font-size:17px}
+.segb{font-size:14px;padding:5px 16px}
+.tab[aria-selected="true"],.segb[aria-pressed="true"]{color:var(--accent-fg);border-color:var(--accent);background:var(--accent)}
+.tab:focus-visible,.segb:focus-visible,.item:focus-visible,.copy:focus-visible{outline:3px solid var(--fg);outline-offset:2px}
+
+.fig{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px;margin-top:16px;overflow-x:auto}
+.fig svg{display:block;width:100%;min-width:620px;height:auto}
+.fig text{font-family:'Noto Sans KR',sans-serif}
+.cap{font-size:13px;color:var(--muted);margin-top:8px}
+.mk{cursor:pointer}
+.mk circle{fill:var(--mark);transition:fill .15s}
+.mk text{fill:var(--mark-fg);font-weight:700;font-size:13px;text-anchor:middle;pointer-events:none}
+.mk.on circle{fill:var(--on)}
+.mk:focus-visible circle{stroke:var(--fg);stroke-width:3}
+
+.items{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px}
+.item{display:grid;grid-template-columns:30px 1fr;gap:12px;text-align:left;font:inherit;background:var(--surface);border:1.5px solid var(--line);border-radius:12px;padding:12px 14px;cursor:pointer;color:var(--fg);min-width:0}
+.item .num{display:grid;place-items:center;width:28px;height:28px;border-radius:50%;background:var(--mark);color:var(--mark-fg);font-weight:700;font-size:14px}
+.item.on{border-color:var(--on)} .item.on .num{background:var(--on);color:#fff}
+.item b{display:block;font-size:16px}
+.item span.d{display:block;color:var(--muted);font-size:14px;line-height:1.6;margin-top:2px}
+@media(max-width:760px){.items{grid-template-columns:1fr}}
+
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:20px;min-width:0;margin-top:16px}
+.steps{display:grid;gap:10px;margin:12px 0 0;padding:0;list-style:none;counter-reset:s}
+.steps li{display:grid;grid-template-columns:32px 1fr;gap:12px;counter-increment:s}
+.steps li::before{content:counter(s);display:grid;place-items:center;width:28px;height:28px;border-radius:50%;background:var(--accent);color:var(--accent-fg);font-weight:700;font-size:14px;margin-top:2px}
+.ex{background:var(--accent-soft);border-radius:10px;padding:12px 14px;margin-top:14px;font-size:14px;line-height:1.7}
+.ex small{display:block;font-weight:700;color:var(--accent);font-size:12px;letter-spacing:.06em;margin-bottom:2px}
+.copy{margin-top:8px;font:inherit;font-size:13px;font-weight:700;border:1.5px solid var(--accent);color:var(--accent);background:transparent;border-radius:8px;padding:2px 12px;cursor:pointer}
+.note{background:var(--warn-soft);border-radius:12px;padding:14px 16px;margin-top:14px;font-size:15px}
+.note b{color:var(--warn)}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:760px){.two{grid-template-columns:1fr}}
+
+.tbl{overflow-x:auto;background:var(--surface);border:1px solid var(--line);border-radius:14px;margin-top:16px}
+table{border-collapse:collapse;width:100%;min-width:560px}
+th,td{padding:12px 16px;text-align:left;vertical-align:top;border-bottom:1px solid var(--line);font-size:15px}
+thead th{font-family:var(--font-display);font-weight:400;font-size:17px}
+tbody th{font-weight:700}
+tr:last-child th,tr:last-child td{border-bottom:0}
+footer{margin-top:48px;font-size:13px;color:var(--muted);border-top:1px solid var(--line);padding-top:16px}
+</style>
+
+<div class="wrap">
+<header>
+  <div class="eyebrow">처음 열었을 때 어디를 보나</div>
+  <h1>Claude, Gemini, ChatGPT 화면 읽는 법</h1>
+  <p>사이드바, 입력창, 모델 선택, 계정과 사용량, 결과물 패널. 번호가 붙은 화면 그림을 눌러 보며 각 자리가 무슨 일을 하는지 익혀 보세요.</p>
+  <div class="tabs" role="tablist" aria-label="서비스 선택">
+    <button class="tab" role="tab" id="tab-claude" data-who="claude" aria-selected="true">Claude</button>
+    <button class="tab" role="tab" id="tab-gem" data-who="gem" aria-selected="false">Gemini</button>
+    <button class="tab" role="tab" id="tab-gpt" data-who="gpt" aria-selected="false">ChatGPT</button>
+  </div>
+</header>
+
+<main id="out"></main>
+
+<section>
+  <div class="eyebrow">이름만 다른 같은 기능</div>
+  <h2>세 서비스 이름 대응표</h2>
+  <p class="lead">한쪽을 익히면 다른 쪽도 쉽습니다. 같은 역할을 하는 기능끼리 묶었습니다.</p>
+  <div class="tbl"><table style="min-width:720px">
+    <thead><tr><th>하고 싶은 일</th><th>Claude</th><th>Gemini</th><th>ChatGPT</th></tr></thead>
+    <tbody>
+      <tr><th>새 대화 시작</th><td>사이드바 "새 채팅"</td><td>메뉴 안 "새 채팅"</td><td>사이드바 "새 채팅"</td></tr>
+      <tr><th>주제별 자료와 지침 모아 두기</th><td>프로젝트</td><td>Gem (도우미 만들기)</td><td>프로젝트</td></tr>
+      <tr><th>역할을 저장한 도우미</th><td>프로젝트 지침, 스타일</td><td>Gem</td><td>나만의 GPT</td></tr>
+      <tr><th>결과물을 옆 창에서 보고 고치기</th><td>아티팩트</td><td>Canvas</td><td>Canvas</td></tr>
+      <tr><th>깊은 조사</th><td>리서치</td><td>Deep Research</td><td>딥 리서치</td></tr>
+      <tr><th>내 말투·선호 저장</th><td>설정의 프로필과 스타일</td><td>설정의 Gemini 지침</td><td>맞춤형 지침과 메모리</td></tr>
+      <tr><th>메일·드라이브 연결</th><td>커넥터</td><td>연결된 앱</td><td>앱(커넥터)</td></tr>
+      <tr><th>모델 바꾸기</th><td>입력창 오른쪽 아래</td><td>화면 위쪽</td><td>화면 위쪽 모델 이름</td></tr>
+      <tr><th>요금제와 계정</th><td>좌측 아래 이름</td><td>우측 위 프로필</td><td>좌측 아래 이름</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<footer>
+  이 페이지의 화면 그림은 구조를 설명하려고 그린 도식이며, 실제 화면과 글자·색·위치가 다를 수 있습니다. 서비스는 화면을 자주 바꾸므로, 메뉴를 못 찾으면 비슷한 이름을 찾아보거나 도움말에서 기능 이름을 검색하세요.
+</footer>
+</div>
+
+<script>
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;')}
+var NS='http://www.w3.org/2000/svg';
+/* 도식 부품 */
+function R(x,y,w,h,r,f,s){return '<rect x="'+x+'" y="'+y+'" width="'+w+'" height="'+h+'" rx="'+r+'" fill="'+f+'"'+(s?' stroke="'+s+'" stroke-width="1.5"':'')+'/>'}
+function T(x,y,s,sz,f,a,w){return '<text x="'+x+'" y="'+y+'" font-size="'+sz+'" fill="'+f+'"'+(a?' text-anchor="'+a+'"':'')+(w?' font-weight="'+w+'"':'')+'>'+s+'</text>'}
+function C(x,y,r,f){return '<circle cx="'+x+'" cy="'+y+'" r="'+r+'" fill="'+f+'"/>'}
+function M(n,x,y){return '<g class="mk" data-n="'+n+'" tabindex="0" role="button" aria-label="'+n+'번 설명 보기"><circle cx="'+x+'" cy="'+y+'" r="13"/><text x="'+x+'" y="'+(y+5)+'">'+n+'</text></g>'}
+function lines(x,y,w,n,f){var h='';for(var i=0;i<n;i++)h+=R(x,y+i*16,i===n-1?w*0.6:w,7,3.5,f);return h}
+var FR='var(--line)',MU='var(--muted)',FG='var(--fg)',AC='var(--accent)',AS='var(--accent-soft)',SU='var(--surface)',SD='var(--side)';
+var SIDEPATH='<path d="M10 0H170V430H10Q0 430 0 420V10Q0 0 10 0Z" fill="var(--side)"/>';
+
+function claudeFig(panel){
+  var s='<svg viewBox="0 0 720 430" role="img" aria-label="Claude 화면 구조 도식">'+R(0.75,0.75,718.5,428.5,12,SU,FR)+SIDEPATH;
+  s+=T(20,34,'Claude',17,AC,0,700);
+  s+=R(12,52,146,30,8,AS)+T(24,72,'＋  새 채팅',13,AC,0,700);
+  s+=T(24,106,'채팅',13,FG)+T(24,134,'프로젝트',13,FG)+T(24,162,'아티팩트',13,FG)+T(24,190,'사용자 지정',13,FG);
+  s+=T(24,226,'최근',11,MU,0,700)+lines(24,238,120,1,FR)+lines(24,258,110,1,FR)+lines(24,278,126,1,FR)+lines(24,298,100,1,FR);
+  s+=R(8,370,154,48,10,SU,FR)+C(30,394,13,AC)+T(30,399,'홍',12,'#fff','middle',700)+T(50,390,'홍길동',13,FG,0,700)+T(50,406,'Pro 요금제',11,MU);
+  var mR=panel?452:720, cx=(170+mR)/2;
+  if(!panel){
+    s+=T(cx,150,'오늘 무엇을 도와드릴까요?',20,FG,'middle',700);
+    s+=R(215,184,470,112,18,SU,FR)+T(236,214,'무엇이든 물어보세요',14,MU);
+    s+=C(244,272,13,AS)+T(244,278,'＋',16,AC,'middle',700)+C(276,272,13,AS)+T(276,277,'⚙',12,AC,'middle')+C(308,272,13,AS)+T(308,277,'🔍',11,AC,'middle');
+    s+=T(560,277,'모델 선택 ▾',12,MU,'middle');
+    s+=C(656,272,15,AC)+T(656,278,'↑',16,'#fff','middle',700);
+    s+=R(215,320,110,28,14,SD)+R(335,320,110,28,14,SD)+R(455,320,110,28,14,SD)+T(270,339,'글쓰기',12,MU,'middle')+T(390,339,'학습',12,MU,'middle')+T(510,339,'코드',12,MU,'middle');
+    s+=M(6,200,190)+M(7,525,330);
+  }else{
+    s+=R(450,0.75,269.5,428.5,12,SU,FR)+'<path d="M450 0V430" stroke="var(--line)" stroke-width="1.5"/>';
+    s+=R(200,40,226,38,12,AS)+T(214,64,'주보 안내문 만들어 줘',12,FG);
+    s+=lines(190,102,236,4,FR)+R(190,176,100,26,13,SD)+T(240,194,'수정 요청',11,MU,'middle');
+    s+=R(190,350,244,52,14,SU,FR)+T(206,380,'수정할 내용을 입력',12,MU)+C(412,376,13,AC)+T(412,381,'↑',14,'#fff','middle',700);
+    s+=R(462,14,246,34,0,'none')+T(472,36,'주보 안내문',14,FG,0,700)+T(598,36,'복사',12,AC,0,700)+T(636,36,'다운로드',12,AC,0,700);
+    s+=R(466,60,238,330,8,SD)+R(480,76,210,14,4,FR)+lines(480,106,210,9,FR)+R(480,270,100,44,8,AS);
+    s+=M(9,682,31)+M(6,205,350)+M(7,436,420);
+  }
+  s+=M(1,176,22)+M(2,186,100)+M(3,186,128)+M(4,186,156)+M(5,186,184)+M(8,158,394);
+  return s+'</svg>';
+}
+function gemFig(panel){
+  var s='<svg viewBox="0 0 720 430" role="img" aria-label="Gemini 화면 구조 도식">'+R(0.75,0.75,718.5,428.5,12,SU,FR);
+  s+=R(0.75,0.75,718.5,48,12,SU)+'<path d="M0 48H720" stroke="var(--line)" stroke-width="1.5"/>';
+  s+='<path d="M20 18h18M20 25h18M20 32h18" stroke="'+FG+'" stroke-width="2.5" stroke-linecap="round"/>'+T(52,32,'Gemini',17,AC,0,700);
+  s+=R(160,12,150,26,13,SD)+T(235,30,'모델 선택 ▾',12,FG,'middle');
+  s+=R(560,12,60,26,13,AS)+T(590,30,'AI Pro',12,AC,'middle',700)+C(650,25,14,AC)+T(650,30,'홍',12,'#fff','middle',700)+'<g fill="'+MU+'"><circle cx="684" cy="19" r="2.2"/><circle cx="692" cy="19" r="2.2"/><circle cx="700" cy="19" r="2.2"/><circle cx="684" cy="27" r="2.2"/><circle cx="692" cy="27" r="2.2"/><circle cx="700" cy="27" r="2.2"/></g>';
+  s+='<path d="M0 49H170V420Q170 430 160 430H10Q0 430 0 420Z" fill="var(--side)"/>';
+  s+=R(12,62,120,34,17,AS)+T(26,84,'＋  새 채팅',13,AC,0,700);
+  s+=T(24,124,'Gem',13,FG)+T(24,152,'내 콘텐츠',13,FG);
+  s+=T(24,188,'최근 대화',11,MU,0,700)+lines(24,200,120,1,FR)+lines(24,220,104,1,FR)+lines(24,240,126,1,FR)+lines(24,260,96,1,FR);
+  s+=T(24,408,'⚙  설정 및 도움말',12,FG,0,700);
+  var mR=panel?452:720, cx=(170+mR)/2;
+  if(!panel){
+    s+=T(cx,150,'안녕하세요, 홍길동님',22,AC,'middle',700);
+    s+=R(215,196,470,92,28,SD)+T(240,228,'Gemini에게 물어보기',14,MU);
+    s+=C(248,264,13,SU)+T(248,270,'＋',16,AC,'middle',700)+R(280,252,66,24,12,SU)+T(313,269,'도구',12,AC,'middle',700)+T(640,269,'🎤',14,MU,'middle');
+    s+=R(215,312,120,28,14,SD)+R(345,312,120,28,14,SD)+R(475,312,100,28,14,SD)+R(585,312,100,28,14,SD);
+    s+=T(275,331,'Deep Research',11,MU,'middle')+T(405,331,'이미지 만들기',11,MU,'middle')+T(525,331,'Canvas',11,MU,'middle')+T(635,331,'영상 만들기',11,MU,'middle');
+    s+=M(7,330,258)+M(6,200,200);
+  }else{
+    s+='<path d="M450 49V430" stroke="var(--line)" stroke-width="1.5"/>';
+    s+=R(200,70,226,38,14,AS)+T(214,94,'주보 안내문 만들어 줘',12,FG);
+    s+=lines(190,130,236,4,FR)+R(190,200,110,26,13,SD)+T(245,218,'Canvas에서 열기',11,MU,'middle');
+    s+=R(190,356,244,46,23,SD)+T(210,384,'수정할 내용을 입력',12,MU);
+    s+=T(468,76,'주보 안내문',14,FG,0,700)+T(590,76,'공유',12,AC,0,700)+T(640,76,'내보내기',12,AC,0,700);
+    s+=R(466,90,238,300,8,SD)+R(480,106,210,14,4,FR)+lines(480,136,210,9,FR);
+    s+=M(9,682,70)+M(6,205,368)+M(7,180,330);
+  }
+  s+=M(1,130,28)+M(2,150,200)+M(3,150,124)+M(4,330,28)+M(5,602,28)+M(8,152,404);
+  return s+'</svg>';
+}
+
+function gptFig(panel){
+  var s='<svg viewBox="0 0 720 430" role="img" aria-label="ChatGPT 화면 구조 도식">'+R(0.75,0.75,718.5,428.5,12,SU,FR)+SIDEPATH;
+  s+=T(20,34,'ChatGPT',16,AC,0,700);
+  s+=R(12,52,146,30,8,AS)+T(24,72,'＋  새 채팅',13,AC,0,700);
+  s+=T(24,106,'채팅 검색',13,FG)+T(24,134,'라이브러리',13,FG)+T(24,162,'프로젝트',13,FG)+T(24,190,'GPT 탐색',13,FG);
+  s+=T(24,226,'채팅',11,MU,0,700)+lines(24,238,120,1,FR)+lines(24,258,110,1,FR)+lines(24,278,126,1,FR)+lines(24,298,100,1,FR);
+  s+=R(8,370,154,48,10,SU,FR)+C(30,394,13,AC)+T(30,399,'홍',12,'#fff','middle',700)+T(50,390,'홍길동',13,FG,0,700)+T(50,406,'플러스',11,MU);
+  var mR=panel?452:720, cx=(170+mR)/2;
+  s+=R(cx-60,8,120,28,14,SD)+T(cx,27,'ChatGPT ▾',12,FG,'middle',700);
+  if(!panel){
+    s+=T(cx,160,'무엇을 도와드릴까요?',20,FG,'middle',700);
+    s+=R(215,196,470,76,38,SD)+T(250,240,'무엇이든 물어보세요',14,MU);
+    s+=C(240,234,13,SU)+T(240,240,'＋',16,AC,'middle',700)+T(626,240,'🎤',14,MU,'middle')+C(662,234,15,AC)+T(662,240,'↑',16,'#fff','middle',700);
+    s+=R(215,296,120,28,14,SD)+R(345,296,100,28,14,SD)+R(455,296,80,28,14,SD)+R(545,296,70,28,14,SD);
+    s+=T(275,315,'이미지 만들기',11,MU,'middle')+T(395,315,'딥 리서치',11,MU,'middle')+T(495,315,'글쓰기',11,MU,'middle')+T(580,315,'코드',11,MU,'middle');
+    s+=M(6,200,196)+M(7,cx+75,22);
+  }else{
+    s+=R(450,0.75,269.5,428.5,12,SU,FR)+'<path d="M450 0V430" stroke="var(--line)" stroke-width="1.5"/>';
+    s+=R(200,60,226,38,12,AS)+T(214,84,'주보 안내문 만들어 줘',12,FG);
+    s+=lines(190,122,236,4,FR)+R(190,196,100,26,13,SD)+T(240,214,'Canvas에서 열기',11,MU,'middle');
+    s+=R(190,350,244,52,26,SD)+T(212,380,'수정할 내용을 입력',12,MU)+C(412,376,13,AC)+T(412,381,'↑',14,'#fff','middle',700);
+    s+=T(472,36,'주보 안내문',14,FG,0,700)+T(620,36,'복사',12,AC,0,700)+T(660,36,'공유',12,AC,0,700);
+    s+=R(466,60,238,330,8,SD)+R(480,76,210,14,4,FR)+lines(480,106,210,9,FR)+R(480,270,100,44,8,AS);
+    s+=M(9,690,50)+M(6,205,350)+M(7,cx+75,22);
+  }
+  s+=M(1,176,22)+M(2,186,100)+M(3,186,128)+M(4,186,156)+M(5,186,184)+M(8,158,394);
+  return s+'</svg>';
+}
+
+var DATA={
+gpt:{
+  tag:'CHATGPT', title:'ChatGPT 화면 구조', lead:'chatgpt.com 또는 앱을 열면 왼쪽에 목록, 위쪽에 모델 이름, 가운데에 입력창이 있는 구조입니다. 셋 중 구성이 가장 단순한 편입니다.',
+  fig:gptFig,
+  items:[
+    ['사이드바 열기·닫기','왼쪽 목록을 접었다 펴는 버튼입니다. 화면이 좁으면 닫아 두세요.'],
+    ['새 채팅과 검색','새 대화를 시작하거나 지난 대화를 검색합니다. 휴대폰에서는 메뉴를 열어야 보입니다.'],
+    ['라이브러리','만든 이미지와 파일을 모아 보는 곳입니다. 메뉴 이름은 버전마다 다를 수 있습니다.'],
+    ['프로젝트','주제별 파일과 지침을 모아 두는 폴더입니다. 설교, 주보처럼 반복 작업에 씁니다.'],
+    ['GPT 탐색','남이 만든 GPT를 찾거나 나만의 GPT를 만드는 곳입니다. 지침을 저장한 도우미로 보면 됩니다.'],
+    ['입력창','질문을 쓰는 곳입니다. ＋로 파일과 사진을 올리고, 이미지 만들기, 딥 리서치, 웹 검색 같은 기능을 고르며, 마이크로 말로 입력할 수도 있습니다.'],
+    ['모델 선택','화면 위쪽 모델 이름을 눌러 빠른 응답 모델과 오래 생각하는 모델 중 고릅니다. 요금제에 따라 선택지가 다릅니다.'],
+    ['계정 이름과 요금제','왼쪽 아래 이름을 누르면 설정, 맞춤 설정, 요금제 관리, 로그아웃이 열립니다. 요금제(플러스 등)가 표시됩니다.'],
+    ['Canvas 패널','긴 글이나 코드를 만들 때 오른쪽에 열리는 편집 창입니다. 직접 고치거나 일부만 다시 쓰게 할 수 있습니다.']
+  ],
+  usage:{title:'사용량은 어디서 볼까', steps:['왼쪽 아래 내 이름을 누릅니다.','설정과 요금제 관리에서 가입한 플랜과 결제일을 확인합니다.','한도에 가까워지면 안내 메시지가 나오고, 다시 쓸 수 있는 시각이 표시됩니다.'],
+    note:'이미지 만들기, 딥 리서치, 에이전트 기능은 기능별 횟수 한도가 따로 있을 수 있습니다. Codex를 쓴다면 Codex 화면의 사용량 표시도 확인하세요. 한도 수치는 자주 바뀌므로 공식 안내를 확인하세요.'},
+  art:{title:'Canvas: 결과물을 옆 창에서 함께 고친다', intro:'긴 글이나 코드를 요청하면 오른쪽에 Canvas 창이 열립니다. 대화는 왼쪽에서 이어가고, 글은 직접 고칠 수도 있습니다.',
+    steps:['입력창의 ＋ 또는 도구 메뉴에서 Canvas를 고르거나, 문서를 만들어 달라고 요청합니다.','오른쪽 Canvas에서 글을 직접 고치거나, 일부를 선택해 "더 쉽게 바꿔 줘"라고 합니다.','코드나 웹페이지는 미리보기로 실제 모습을 확인합니다.','복사하거나 내려받아 사용합니다.'],
+    ex:'Canvas에서 이번 주 소그룹 모임 안내문을 써 줘. 시간, 장소, 나눔 질문 3개를 넣고 따뜻한 말투로.'},
+  cus:{title:'사용자 지정: 맞춤형 지침과 메모리', intro:'설정에서 맞춤형 지침을 적어 두면 모든 대화에 반영됩니다. 메모리를 켜면 대화 중 알게 된 내 선호도 기억합니다.',
+    steps:['설정에서 "개인 맞춤 설정"을 엽니다.','"맞춤형 지침"에 내 소개와 원하는 답변 방식을 적습니다.','"메모리"를 켜면 선호를 기억합니다. 기억 목록은 직접 지울 수 있습니다.','주제별 지침은 프로젝트에, 역할별 도우미는 나만의 GPT에 저장합니다. 연결할 앱은 필요한 것만 켭니다.'],
+    ex:'저는 교회 목회자입니다. 항상 한국어 존댓말로 답하고, 먼저 핵심 세 줄을 보여 준 뒤 설명해 주세요. 확실하지 않은 내용은 확실하지 않다고 말해 주세요.'}
+},
+claude:{
+  tag:'CLAUDE', title:'Claude 화면 구조', lead:'claude.ai 또는 데스크톱·모바일 앱을 열면 왼쪽에 목록, 가운데 대화, 필요할 때 오른쪽에 결과물이 나타나는 3단 구조입니다.',
+  fig:claudeFig,
+  items:[
+    ['사이드바 열기·닫기','왼쪽 목록을 접었다 펴는 버튼입니다. 화면이 좁을 때는 닫아 두면 편합니다.'],
+    ['채팅 목록과 검색','지난 대화를 다시 열거나 검색합니다. 중요한 대화는 이름을 바꿔 두세요.'],
+    ['프로젝트','주제별 자료와 지침을 모아 두는 폴더입니다. 설교, 주보처럼 반복 작업에 씁니다.'],
+    ['아티팩트','만든 문서·웹페이지·도표를 모아 보는 곳입니다. 직접 만들어 고칠 수도 있습니다.'],
+    ['사용자 지정','내 정보와 말투, 연결할 도구를 정하는 곳입니다. 메뉴 이름과 위치는 버전마다 다릅니다.'],
+    ['입력창','질문을 쓰는 곳입니다. ＋ 버튼으로 파일과 사진을 올리고, 도구 버튼에서 웹 검색·리서치·확장된 생각을 켭니다.'],
+    ['모델 선택','입력창 오른쪽 아래에서 모델을 고릅니다. 간단한 일은 빠른 모델, 어려운 일은 상위 모델을 씁니다.'],
+    ['계정 이름과 요금제','왼쪽 아래 이름을 누르면 설정, 사용량, 언어, 로그아웃 메뉴가 열립니다. 요금제(Pro 등)가 여기 표시됩니다.'],
+    ['아티팩트 패널','문서나 코드를 만들면 오른쪽에 열리는 창입니다. 복사, 다운로드, 공유 버튼이 위에 있습니다.']
+  ],
+  usage:{title:'사용량은 어디서 볼까', steps:['왼쪽 아래 내 이름을 누릅니다.','설정을 열고 "사용량" 항목을 찾습니다.','현재 세션 한도와 주간 한도가 막대로 보이고, 언제 다시 채워지는지도 표시됩니다.'],
+    note:'한도가 거의 찼다면 큰 작업은 나눠서 하거나 초기화 시각 이후로 미루세요. Claude Code를 쓴다면 같은 요금제 한도를 함께 쓰는 것이 일반적입니다.'},
+  art:{title:'아티팩트: 결과물이 옆 창에 열린다', intro:'긴 문서, 웹페이지, 도표, 프로그램을 요청하면 대화창이 아닌 오른쪽 패널에 결과물이 열립니다. 대화는 왼쪽에서 계속하면서 결과물만 고쳐 나갑니다.',
+    steps:['"A4 한 장짜리 주보 안내 웹페이지를 만들어 줘"처럼 결과물이 있는 요청을 합니다.','오른쪽 패널에서 미리보기와 코드를 오가며 확인합니다.','"제목을 크게, 색을 더 차분하게"처럼 왼쪽 대화로 고쳐 달라고 합니다.','마음에 들면 복사하거나 다운로드하고, 공유 기능으로 링크를 만듭니다.'],
+    ex:'우리 교회 소그룹 모임 안내 웹페이지를 만들어 줘. 날짜, 장소, 준비물이 표로 보이고 휴대폰에서도 읽기 좋게.'},
+  cus:{title:'사용자 지정: 한 번 알려 주고 계속 반영', intro:'설정의 프로필에 내 직업과 원하는 답변 방식을 적어 두면 모든 대화에 반영됩니다. 말투는 "스타일"로, 주제별 지침은 프로젝트에 따로 둡니다.',
+    steps:['설정에서 프로필(선호 사항) 칸에 내 상황과 원하는 답변 방식을 적습니다.','입력창의 도구 메뉴에서 "스타일"을 고르거나 내 스타일을 만듭니다.','자주 하는 일은 프로젝트를 만들어 그 안에 지침과 자료를 둡니다.','연결할 도구(드라이브, 메일 등)는 커넥터에서 켭니다. 필요한 것만 켜세요.'],
+    ex:'저는 교회 목회자입니다. 항상 한국어 존댓말로, 쉬운 단어로 답해 주세요. 길게 쓰기 전에 먼저 세 줄로 요약을 보여 주세요. 모르는 것은 추측하지 말고 모른다고 말해 주세요.'}
+},
+gem:{
+  tag:'GEMINI', title:'Gemini 화면 구조', lead:'gemini.google.com 또는 앱을 열면 위에 메뉴와 모델, 왼쪽에 대화 목록, 가운데 입력창이 있는 구조입니다. 구글 계정과 바로 이어져 있습니다.',
+  fig:gemFig,
+  items:[
+    ['메뉴(☰)와 새 채팅','왼쪽 목록을 열고 닫는 버튼입니다. 열면 새 채팅을 시작할 수 있습니다.'],
+    ['최근 대화 목록','지난 대화를 다시 열거나 검색합니다. 휴대폰에서는 메뉴를 열어야 보입니다.'],
+    ['Gem','나만의 도우미를 만들고 불러오는 곳입니다. 주보 편집자처럼 역할을 저장해 둡니다.'],
+    ['모델 선택','화면 위쪽에서 빠른 모델과 상위 모델 중 고릅니다. 요금제에 따라 쓸 수 있는 모델이 다릅니다.'],
+    ['프로필과 요금제 표시','오른쪽 위에 AI Pro 같은 요금제 표시와 구글 계정 사진이 있습니다. 누르면 계정과 구독 관리로 이어집니다.'],
+    ['입력창','질문을 쓰는 곳입니다. ＋로 파일, 사진, 드라이브 자료를 올리고 마이크로 말로 입력할 수도 있습니다.'],
+    ['도구','Deep Research, 이미지 만들기, Canvas, 영상 만들기 같은 특별 기능을 고르는 곳입니다.'],
+    ['설정 및 도움말','왼쪽 아래에서 열립니다. 지침, 연결된 앱, 활동 기록, 구독 관련 항목이 여기에 있습니다.'],
+    ['Canvas 패널','문서나 코드를 만들면 오른쪽에 열리는 편집 창입니다. 공유와 내보내기 버튼이 위에 있습니다.']
+  ],
+  usage:{title:'사용량은 어디서 볼까', steps:['오른쪽 위 프로필 사진을 눌러 구글 계정 메뉴를 엽니다.','구독 관리(구글 원)에서 AI Pro 가입 상태와 결제일을 확인합니다.','대화 중 한도에 가까워지면 안내 메시지가 나오고, 다시 쓸 수 있는 시각을 알려 줍니다.'],
+    note:'Gemini는 Claude처럼 항상 보이는 막대가 없을 수 있습니다. 이미지와 영상 생성은 하루 횟수 한도가 따로 있는 경우가 많습니다. 정확한 한도는 설정 및 도움말 또는 공식 안내에서 확인하세요.'},
+  art:{title:'Canvas: 결과물을 옆 창에서 함께 고친다', intro:'긴 글이나 웹페이지, 코드를 만들 때 오른쪽에 Canvas 창이 열립니다. 직접 글을 고칠 수도 있고, AI에게 일부만 다시 쓰게 할 수도 있습니다.',
+    steps:['입력창의 "도구"에서 Canvas를 고르거나, 문서·웹페이지를 만들어 달라고 요청합니다.','오른쪽 Canvas에서 글을 직접 수정하거나, 부분을 선택해 "더 쉽게 바꿔 줘"라고 합니다.','웹페이지나 코드는 미리보기로 실제 모습을 확인합니다.','공유하거나 구글 문서로 내보냅니다.'],
+    ex:'Canvas에서 이번 주 소그룹 모임 안내문을 써 줘. 시간, 장소, 나눔 질문 3개를 넣고 따뜻한 말투로.'},
+  cus:{title:'사용자 지정: 지침과 Gem으로 내 방식 만들기', intro:'설정에서 Gemini가 항상 따를 지침을 적고, 자주 하는 일은 Gem으로 저장합니다. 연결된 앱을 켜면 Gmail과 드라이브 자료를 바탕으로 답합니다.',
+    steps:['왼쪽 아래 "설정 및 도움말"을 엽니다.','"Gemini에 대한 지침" 같은 항목에 내 상황과 원하는 답변 방식을 적습니다.','왼쪽 목록의 Gem에서 새 Gem을 만들어 역할과 지침을 저장합니다.','"연결된 앱"에서 Gmail, 드라이브 등 필요한 것만 켭니다.'],
+    ex:'저는 교회 목회자입니다. 항상 한국어 존댓말로 답하고, 먼저 핵심 세 줄을 보여 준 뒤 설명해 주세요. 확실하지 않은 내용은 확실하지 않다고 말해 주세요.'}
+}};
+
+var who='claude', panel=false, sel=0;
+function build(){
+  var d=DATA[who], h='';
+  h+='<section><div class="eyebrow">'+d.tag+'</div><h2>'+d.title+'</h2><p class="lead">'+d.lead+'</p>';
+  h+='<div class="seg" role="group" aria-label="화면 상태" style="margin-top:14px"><button class="segb" data-p="0" aria-pressed="'+(!panel)+'">첫 화면</button><button class="segb" data-p="1" aria-pressed="'+panel+'">결과물 패널이 열린 화면</button></div>';
+  h+='<div class="fig" id="figbox">'+d.fig(panel)+'</div><div class="cap">그림의 번호를 누르거나 아래 설명을 눌러 짝을 확인하세요. 실제 화면과 다를 수 있는 도식입니다.</div>';
+  h+='<div class="items">';
+  d.items.forEach(function(it,i){
+    var n=i+1;
+    h+='<button class="item" data-n="'+n+'"><span class="num">'+n+'</span><span><b>'+it[0]+'</b><span class="d">'+it[1]+'</span></span></button>';
+  });
+  h+='</div></section>';
+  h+='<section><div class="eyebrow">계정과 사용량</div><h2>'+d.usage.title+'</h2><div class="card"><ol class="steps">'+d.usage.steps.map(function(x){return '<li><span>'+x+'</span></li>'}).join('')+'</ol><div class="note"><b>알아 두기</b> '+d.usage.note+'</div></div></section>';
+  h+=block('결과물 패널',d.art,'art');
+  h+=block('사용자 지정',d.cus,'cus');
+  document.getElementById('out').innerHTML=h;
+  mark();
+}
+function block(eb,o,id){
+  return '<section><div class="eyebrow">'+eb+'</div><h2>'+o.title+'</h2><p class="lead">'+o.intro+'</p><div class="card"><ol class="steps">'+o.steps.map(function(x){return '<li><span>'+x+'</span></li>'}).join('')+'</ol><div class="ex"><small>복사해서 써 보세요</small><span id="ex-'+id+'">'+esc(o.ex)+'</span><br><button class="copy" data-t="ex-'+id+'">복사</button></div></div></section>';
+}
+function mark(){
+  document.querySelectorAll('.mk').forEach(function(g){g.classList.toggle('on',+g.dataset.n===sel)});
+  document.querySelectorAll('.item').forEach(function(b){b.classList.toggle('on',+b.dataset.n===sel)});
+}
+function pick(w){
+  who=w; sel=0;
+  document.documentElement.setAttribute('data-who',w);
+  ['claude','gem','gpt'].forEach(function(k){document.getElementById('tab-'+k).setAttribute('aria-selected',k===w?'true':'false')});
+  build();
+  try{history.replaceState(null,'','#'+w)}catch(e){}
+}
+document.querySelectorAll('.tab').forEach(function(b){b.addEventListener('click',function(){pick(b.dataset.who)})});
+document.getElementById('out').addEventListener('click',function(e){
+  var t=e.target;
+  var sb=t.closest('.segb');
+  if(sb){panel=sb.dataset.p==='1';sel=0;build();return}
+  var mk=t.closest('.mk');
+  var it=t.closest('.item');
+  var cp=t.closest('.copy');
+  if(mk||it){
+    var n=+(mk||it).dataset.n; sel=(sel===n)?0:n; mark();
+    if(mk){var el=document.querySelector('.item[data-n="'+n+'"]'); if(el&&sel)el.scrollIntoView({block:'nearest',behavior:'smooth'})}
+    return;
+  }
+  if(cp){
+    var el2=document.getElementById(cp.dataset.t),txt=el2.textContent;
+    var done=function(){cp.textContent='복사됨';setTimeout(function(){cp.textContent='복사'},1500)};
+    var fb=function(){var r=document.createRange();r.selectNodeContents(el2);var s=getSelection();s.removeAllRanges();s.addRange(r);cp.textContent='선택됨 (Ctrl+C)'};
+    try{navigator.clipboard.writeText(txt).then(done,fb)}catch(err){fb()}
+  }
+});
+document.getElementById('out').addEventListener('keydown',function(e){
+  if((e.key==='Enter'||e.key===' ')&&e.target.classList&&e.target.classList.contains('mk')){e.preventDefault();var n=+e.target.dataset.n;sel=(sel===n)?0:n;mark()}
+});
+function fromHash(){return location.hash==='#gem'?'gem':(location.hash==='#gpt'?'gpt':'claude')}
+window.addEventListener('hashchange',function(){pick(fromHash())});
+pick(fromHash());
+</script>
+
+</html>

@@ -1,0 +1,307 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>:root{color-scheme:light}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>AI 무료 vs 프로 비교</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Do+Hyeon&family=Noto+Sans+KR:wght@400;500;700&display=swap">
+<style>
+/* Layout: 시식(무료) vs 정식 작업실(프로) 비유로 이어지는 한 컬럼 강의 페이지, 좌우 비교 카드와 표 */
+:root{
+  --bg:#f2f6f8; --surface:#ffffff; --fg:#13212c; --muted:#556675; --line:#d6e0e6;
+  --free:#7b8b98; --free-soft:#e6ecf0;
+  --pro:#0b7a85; --pro-soft:#d9f0f2;
+  --hot:#e8782e; --hot-soft:#fdeadb;
+  --font-display:'Do Hyeon','Noto Sans KR',sans-serif;
+  --font-body:'Noto Sans KR',system-ui,sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0e171e; --surface:#16232d; --fg:#e8eff3; --muted:#9fb0bc; --line:#26384a;
+  --free:#8fa0ad; --free-soft:#22313c; --pro:#3cc3cf; --pro-soft:#123c42;
+  --hot:#f3a068; --hot-soft:#3d2a1c; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0e171e; --surface:#16232d; --fg:#e8eff3; --muted:#9fb0bc; --line:#26384a;
+  --free:#8fa0ad; --free-soft:#22313c; --pro:#3cc3cf; --pro-soft:#123c42;
+  --hot:#f3a068; --hot-soft:#3d2a1c; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font:16px/1.75 var(--font-body);
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0 56px}
+.wrap{max-width:980px;margin:0 auto}
+h1,h2,h3{font-family:var(--font-display);font-weight:400;text-wrap:balance;line-height:1.3;margin:0}
+h1{font-size:clamp(34px,6vw,56px)}
+h2{font-size:clamp(26px,4vw,34px);margin-bottom:8px}
+h3{font-size:22px}
+p{margin:0 0 12px}
+section{margin-top:64px}
+.lead{color:var(--muted);max-width:60ch}
+.eyebrow{font-size:13px;letter-spacing:.12em;color:var(--pro);font-weight:700;text-transform:uppercase}
+
+/* hero */
+.hero{display:grid;grid-template-columns:1.05fr 1fr;gap:32px;align-items:center;padding-block:48px 0}
+.hero p{max-width:44ch;color:var(--muted);font-size:18px;margin-top:16px}
+.hero svg{width:100%;height:auto;max-width:100%}
+@media(max-width:760px){.hero{grid-template-columns:1fr}}
+
+/* 비유 카드 */
+.analogy{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:20px}
+.tier{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:22px;min-width:0}
+.tier.pro{border-color:var(--pro);box-shadow:0 0 0 3px var(--pro-soft)}
+.tier svg{width:100%;height:auto;max-height:150px;margin-bottom:10px}
+.tag{display:inline-block;font-size:13px;font-weight:700;padding:2px 12px;border-radius:99px;margin-bottom:8px}
+.tag.free{background:var(--free-soft);color:var(--muted)}
+.tag.pro{background:var(--pro-soft);color:var(--pro)}
+@media(max-width:640px){.analogy{grid-template-columns:1fr}}
+
+/* 사용량 그림 */
+.chart{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:22px;margin-top:20px}
+.bars{display:grid;gap:14px;margin-top:14px}
+.bar-row{display:grid;grid-template-columns:96px 1fr;gap:12px;align-items:center}
+.bar-row b{font-size:15px}
+.track{background:var(--free-soft);border-radius:8px;height:30px;overflow:hidden}
+.fill{height:100%;border-radius:8px;display:flex;align-items:center;padding-left:10px;font-size:13px;color:#fff;font-weight:700;white-space:nowrap}
+.fill.f{background:var(--free);width:18%}
+.fill.p{background:var(--pro);width:90%}
+.fill.m{background:var(--hot);width:100%}
+.note{font-size:13px;color:var(--muted);margin-top:12px}
+
+/* 표 */
+.tbl{overflow-x:auto;background:var(--surface);border:1px solid var(--line);border-radius:14px;margin-top:20px}
+table{border-collapse:collapse;width:100%;min-width:640px}
+th,td{padding:14px 16px;text-align:left;vertical-align:top;border-bottom:1px solid var(--line);font-size:15px}
+thead th{font-family:var(--font-display);font-weight:400;font-size:18px}
+th.fr{color:var(--muted)} th.pr{color:var(--pro)}
+tbody th{font-weight:700;width:22%}
+td.pr{background:var(--pro-soft)}
+tr:last-child th,tr:last-child td{border-bottom:0}
+
+/* 서비스별 */
+.two{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px;margin-top:20px}
+.svc{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:22px;min-width:0}
+.svc h3{display:flex;align-items:center;gap:10px}
+.svc svg{width:32px;height:32px;flex:none}
+.svc ul{padding-left:20px;margin:12px 0 0}
+.svc li{margin-bottom:6px}
+.price{font-size:14px;color:var(--muted);margin-top:12px;padding-top:12px;border-top:1px dashed var(--line)}
+@media(max-width:640px){.two{grid-template-columns:1fr}}
+
+/* 상황별 */
+.cases{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:20px}
+.case{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:20px;min-width:0}
+.case svg{width:100%;height:auto;max-height:120px;margin-bottom:8px}
+.case .verdict{display:inline-block;margin-top:6px;font-weight:700;font-size:14px;padding:2px 10px;border-radius:8px}
+.v-free{background:var(--free-soft);color:var(--muted)}
+.v-pro{background:var(--pro-soft);color:var(--pro)}
+.v-both{background:var(--hot-soft);color:var(--hot)}
+@media(max-width:760px){.cases{grid-template-columns:1fr}}
+
+/* 결론 */
+.tip{background:var(--hot-soft);border-radius:14px;padding:22px;margin-top:20px}
+.tip h3{color:var(--hot);margin-bottom:6px}
+.tip ol{margin:8px 0 0;padding-left:22px}
+footer{margin-top:48px;font-size:13px;color:var(--muted);border-top:1px solid var(--line);padding-top:16px}
+@media (prefers-reduced-motion:no-preference){.fill{transition:width .8s ease}}
+</style>
+
+<div class="wrap">
+
+<header class="hero">
+  <div>
+    <div class="eyebrow">Claude · Gemini</div>
+    <h1>무료로 써도 되는데,<br>왜 프로를 쓸까?</h1>
+    <p>같은 AI인데 무료와 프로는 무엇이 다른지, 어떤 사람에게 프로가 필요한지 쉬운 비유로 정리했습니다.</p>
+  </div>
+  <svg viewBox="0 0 440 320" role="img" aria-label="작은 충전량의 무료 배터리와 가득 찬 프로 배터리 그림">
+    <rect x="10" y="10" width="420" height="300" rx="24" fill="var(--surface)" stroke="var(--line)"/>
+    <!-- free battery -->
+    <g transform="translate(40,70)">
+      <rect x="0" y="0" width="150" height="76" rx="12" fill="none" stroke="var(--free)" stroke-width="5"/>
+      <rect x="150" y="24" width="10" height="28" rx="3" fill="var(--free)"/>
+      <rect x="9" y="9" width="30" height="58" rx="6" fill="var(--free)"/>
+      <text x="75" y="118" text-anchor="middle" font-size="20" fill="var(--muted)" font-family="Do Hyeon, sans-serif">무료</text>
+      <text x="75" y="142" text-anchor="middle" font-size="12" fill="var(--muted)">금방 다 쓰고 기다림</text>
+    </g>
+    <!-- pro battery -->
+    <g transform="translate(240,70)">
+      <rect x="0" y="0" width="150" height="76" rx="12" fill="none" stroke="var(--pro)" stroke-width="5"/>
+      <rect x="150" y="24" width="10" height="28" rx="3" fill="var(--pro)"/>
+      <rect x="9" y="9" width="108" height="58" rx="6" fill="var(--pro)"/>
+      <path d="M124 14 L110 42 H124 L116 62 L138 32 H124 Z" fill="var(--hot)"/>
+      <text x="75" y="118" text-anchor="middle" font-size="20" fill="var(--pro)" font-family="Do Hyeon, sans-serif">프로</text>
+      <text x="75" y="142" text-anchor="middle" font-size="12" fill="var(--muted)">오래, 많이, 큰 작업까지</text>
+    </g>
+    <!-- chat bubbles -->
+    <g>
+      <rect x="40" y="235" width="120" height="38" rx="14" fill="var(--free-soft)"/>
+      <circle cx="68" cy="254" r="4" fill="var(--free)"/><circle cx="84" cy="254" r="4" fill="var(--free)"/><circle cx="100" cy="254" r="4" fill="var(--free)"/>
+      <rect x="210" y="228" width="180" height="46" rx="14" fill="var(--pro-soft)"/>
+      <rect x="226" y="242" width="110" height="7" rx="3.5" fill="var(--pro)"/>
+      <rect x="226" y="256" width="146" height="7" rx="3.5" fill="var(--pro)" opacity=".6"/>
+    </g>
+  </svg>
+</header>
+
+<section>
+  <div class="eyebrow">먼저 비유부터</div>
+  <h2>무료는 시식 코너, 프로는 내 작업실</h2>
+  <p class="lead">시식 코너에서도 맛은 충분히 알 수 있습니다. 하지만 매일 요리를 해야 한다면 내 주방이 필요합니다.</p>
+  <div class="analogy">
+    <div class="tier">
+      <svg viewBox="0 0 300 150" role="img" aria-label="작은 시식 접시">
+        <ellipse cx="150" cy="112" rx="110" ry="22" fill="var(--free-soft)"/>
+        <ellipse cx="150" cy="100" rx="70" ry="14" fill="var(--surface)" stroke="var(--free)" stroke-width="3"/>
+        <circle cx="150" cy="84" r="14" fill="var(--free)"/>
+        <rect x="143" y="40" width="14" height="30" rx="4" fill="var(--free-soft)" stroke="var(--free)" stroke-width="2"/>
+      </svg>
+      <span class="tag free">무료</span>
+      <h3>맛보기로 충분한 날</h3>
+      <p>가끔 질문하고, 짧은 글을 고치고, 궁금한 것을 물어볼 때 좋습니다. 많이 쓰면 "잠시 후 다시 시도"가 나옵니다.</p>
+    </div>
+    <div class="tier pro">
+      <svg viewBox="0 0 300 150" role="img" aria-label="도구가 가득한 작업대">
+        <rect x="30" y="92" width="240" height="14" rx="6" fill="var(--pro)"/>
+        <rect x="50" y="106" width="10" height="34" fill="var(--pro)"/><rect x="240" y="106" width="10" height="34" fill="var(--pro)"/>
+        <rect x="60" y="40" width="80" height="52" rx="6" fill="var(--surface)" stroke="var(--pro)" stroke-width="3"/>
+        <rect x="70" y="52" width="50" height="6" rx="3" fill="var(--pro)"/><rect x="70" y="66" width="60" height="6" rx="3" fill="var(--pro)" opacity=".5"/>
+        <rect x="160" y="58" width="34" height="34" rx="4" fill="var(--hot)"/>
+        <rect x="200" y="46" width="34" height="46" rx="4" fill="var(--pro-soft)" stroke="var(--pro)" stroke-width="2"/>
+      </svg>
+      <span class="tag pro">프로</span>
+      <h3>매일 일하는 도구</h3>
+      <p>긴 자료를 올리고, 오래 대화하고, 조사와 문서 작성까지 맡길 수 있습니다. 한도가 넉넉해 흐름이 끊기지 않습니다.</p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="eyebrow">사용량</div>
+  <h2>가장 큰 차이는 "얼마나 오래 쓸 수 있나"</h2>
+  <p class="lead">무료는 일정 시간 안에 쓸 수 있는 양이 적고, 프로는 이를 크게 늘려 줍니다. 아래 그림은 이해를 돕기 위한 개념도이며 실제 숫자가 아닙니다.</p>
+  <div class="chart">
+    <b>같은 시간 동안 쓸 수 있는 양 (개념도)</b>
+    <div class="bars">
+      <div class="bar-row"><b>무료</b><div class="track"><div class="fill f">기본</div></div></div>
+      <div class="bar-row"><b>프로</b><div class="track"><div class="fill p">훨씬 많이</div></div></div>
+      <div class="bar-row"><b>상위 요금제</b><div class="track"><div class="fill m">매우 많이 (전문가용)</div></div></div>
+    </div>
+    <p class="note">한도는 시간대와 서비스 상황에 따라 달라지고, 사용 시간이 지나면 다시 채워집니다.</p>
+  </div>
+</section>
+
+<section>
+  <div class="eyebrow">한눈에 비교</div>
+  <h2>무료와 프로, 항목별 차이</h2>
+  <div class="tbl">
+    <table>
+      <thead><tr><th></th><th class="fr">무료</th><th class="pr">프로</th></tr></thead>
+      <tbody>
+        <tr><th>사용 한도</th><td>적음. 한도에 닿으면 기다려야 함</td><td class="pr">크게 늘어남. 하루 종일 작업 가능</td></tr>
+        <tr><th>AI 모델</th><td>기본 모델 위주. 혼잡하면 제한될 수 있음</td><td class="pr">더 똑똑한 상위 모델을 우선 사용</td></tr>
+        <tr><th>긴 자료 처리</th><td>짧은 문서, 파일 몇 개</td><td class="pr">긴 문서·여러 파일을 한꺼번에 분석</td></tr>
+        <tr><th>깊은 조사</th><td>제한적이거나 횟수가 적음</td><td class="pr">웹을 폭넓게 찾아 보고서로 정리</td></tr>
+        <tr><th>문서·파일 만들기</th><td>일부만 가능</td><td class="pr">문서, 표, 슬라이드 파일 생성 확대</td></tr>
+        <tr><th>대화 기억·정리</th><td>기본 수준</td><td class="pr">주제별 폴더(프로젝트)로 자료와 지침 보관</td></tr>
+        <tr><th>새 기능</th><td>나중에 열리는 경우가 많음</td><td class="pr">먼저 써 볼 수 있음</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section>
+  <div class="eyebrow">서비스별 특징</div>
+  <h2>Claude, Gemini, ChatGPT는 프로에서 이런 점이 다릅니다</h2>
+  <div class="two">
+    <div class="svc">
+      <h3>
+        <svg viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="15" fill="var(--hot)"/><path d="M16 6l2 8 8 2-8 2-2 8-2-8-8-2 8-2z" fill="#fff"/></svg>
+        Claude
+      </h3>
+      <p class="lead" style="margin:6px 0 0">글쓰기와 긴 문서 작업, 코드에 강점</p>
+      <ul>
+        <li>긴 글을 읽고 요약, 번역, 다듬기</li>
+        <li>프로젝트에 자료를 모아 두고 이어서 작업</li>
+        <li>문서, 스프레드시트, 슬라이드 파일 만들기</li>
+        <li>프로그램 제작과 코딩 도구 사용</li>
+      </ul>
+      <div class="price">요금: 무료 / 프로 월 약 20달러 / 더 큰 상위 요금제</div>
+    </div>
+    <div class="svc">
+      <h3>
+        <svg viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="15" fill="var(--pro)"/><path d="M16 5c1 6 5 10 11 11-6 1-10 5-11 11-1-6-5-10-11-11 6-1 10-5 11-11z" fill="#fff"/></svg>
+        Gemini
+      </h3>
+      <p class="lead" style="margin:6px 0 0">구글 서비스와의 연결, 이미지·영상에 강점</p>
+      <ul>
+        <li>Gmail, 문서, 드라이브 안에서 바로 AI 사용</li>
+        <li>이미지와 짧은 영상 만들기 한도 확대</li>
+        <li>깊은 조사(Deep Research)와 긴 자료 분석</li>
+        <li>구글 저장 공간이 함께 늘어나는 구성</li>
+      </ul>
+      <div class="price">요금: 무료 / 프로 월 약 2만 원대 (구글 AI 프로) / 상위 요금제</div>
+    </div>
+    <div class="svc">
+      <h3>
+        <svg viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="15" fill="var(--fg)"/><circle cx="16" cy="16" r="7" fill="none" stroke="var(--surface)" stroke-width="3"/></svg>
+        ChatGPT
+      </h3>
+      <p class="lead" style="margin:6px 0 0">대화, 이미지, 음성, 코딩까지 한곳에서 쓰는 만능형</p>
+      <ul>
+        <li>가장 폭넓은 기능. 이미지 만들기와 음성 대화가 편함</li>
+        <li>딥 리서치와 웹을 직접 둘러보는 에이전트 기능</li>
+        <li>나만의 GPT와 메모리로 내 방식 저장</li>
+        <li>코딩 에이전트 Codex를 같은 구독으로 사용</li>
+      </ul>
+      <div class="price">요금: 무료 / 플러스 월 약 20달러 / 더 큰 상위 요금제 (지역별 보급형도 있음)</div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="eyebrow">나에게 필요할까</div>
+  <h2>이런 경우엔 이렇게 고르세요</h2>
+  <div class="cases">
+    <div class="case">
+      <svg viewBox="0 0 200 100" role="img" aria-label="짧은 대화 말풍선">
+        <rect x="14" y="12" width="110" height="34" rx="14" fill="var(--free-soft)"/>
+        <rect x="76" y="54" width="110" height="34" rx="14" fill="var(--pro-soft)"/>
+      </svg>
+      <h3>가끔 물어보는 정도</h3>
+      <p>맛집, 맞춤법, 간단한 설명처럼 한두 번 묻고 끝나는 용도입니다.</p>
+      <span class="verdict v-free">무료로 충분</span>
+    </div>
+    <div class="case">
+      <svg viewBox="0 0 200 100" role="img" aria-label="쌓인 문서">
+        <rect x="40" y="26" width="90" height="62" rx="6" fill="var(--surface)" stroke="var(--line)" stroke-width="3"/>
+        <rect x="56" y="16" width="90" height="62" rx="6" fill="var(--surface)" stroke="var(--pro)" stroke-width="3"/>
+        <rect x="70" y="30" width="60" height="6" rx="3" fill="var(--pro)"/><rect x="70" y="44" width="46" height="6" rx="3" fill="var(--pro)" opacity=".5"/>
+        <rect x="70" y="58" width="52" height="6" rx="3" fill="var(--pro)" opacity=".5"/>
+      </svg>
+      <h3>매일 글과 자료를 다룸</h3>
+      <p>원고, 보고서, 회의록, 긴 PDF를 자주 다루고 한도에 자주 걸립니다.</p>
+      <span class="verdict v-pro">프로 추천</span>
+    </div>
+    <div class="case">
+      <svg viewBox="0 0 200 100" role="img" aria-label="저울">
+        <path d="M100 18v62M60 80h80" stroke="var(--fg)" stroke-width="4" stroke-linecap="round"/>
+        <path d="M44 34h112" stroke="var(--fg)" stroke-width="4" stroke-linecap="round"/>
+        <path d="M44 34l-16 28h32zM156 34l-16 28h32z" fill="var(--hot-soft)" stroke="var(--hot)" stroke-width="3"/>
+      </svg>
+      <h3>잘 모르겠음</h3>
+      <p>둘 다 무료로 일주일씩 써 보고, 한도에 자주 걸리는 쪽만 결제하세요.</p>
+      <span class="verdict v-both">먼저 무료 체험</span>
+    </div>
+  </div>
+
+  <div class="tip">
+    <h3>결제 전에 이 세 가지만 확인하세요</h3>
+    <ol>
+      <li>최근 한 달 동안 "사용 한도에 도달했어요" 메시지를 몇 번 봤나요?</li>
+      <li>그 때문에 일이 끊기거나 늦어진 적이 있나요?</li>
+      <li>있다면 월 2만 원 안팎의 비용이 아깝지 않을 만큼 시간을 아끼나요?</li>
+    </ol>
+  </div>
+</section>
+
+<footer>
+  요금과 사용 한도, 포함 기능은 자주 바뀝니다. 결제 전에 Claude(claude.ai)와 Gemini(gemini.google.com)의 공식 요금 안내를 꼭 확인하세요. 이 페이지의 그림은 설명용 일러스트입니다.
+</footer>
+</div>
+
+</html>

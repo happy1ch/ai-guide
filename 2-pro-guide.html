@@ -1,0 +1,234 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>:root{color-scheme:light}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>AI 프로 제대로 쓰기</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Do+Hyeon&family=Noto+Sans+KR:wght@400;500;700&display=swap">
+<style>
+/* Layout: 상단 탭(Claude/Gemini)으로 같은 구조의 가이드 두 개를 전환. 각 가이드는 준비 → 기능 카드 → 습관 → 주의 순서 */
+:root{
+  --bg:#f2f6f8; --surface:#ffffff; --fg:#13212c; --muted:#556675; --line:#d6e0e6;
+  --accent:#d9631e; --accent-soft:#fbe6d6; --accent-fg:#ffffff;
+  --claude:#d9631e; --claude-soft:#fbe6d6;
+  --gemini:#2b66d9; --gemini-soft:#dde8fb; --gpt:#0b8a68; --gpt-soft:#d8f1e7;
+  --warn:#b4372b; --warn-soft:#fbe3df;
+  --font-display:'Do Hyeon','Noto Sans KR',sans-serif;
+  --font-body:'Noto Sans KR',system-ui,sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0e171e; --surface:#16232d; --fg:#e8eff3; --muted:#9fb0bc; --line:#26384a;
+  --accent:#f09a62; --accent-soft:#3d2a1c; --accent-fg:#1b1008;
+  --claude:#f09a62; --claude-soft:#3d2a1c; --gemini:#7aa7ff; --gemini-soft:#1b2b4a; --gpt:#4fd1a5; --gpt-soft:#123d30;
+  --warn:#f08a7e; --warn-soft:#3f2420; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0e171e; --surface:#16232d; --fg:#e8eff3; --muted:#9fb0bc; --line:#26384a;
+  --accent:#f09a62; --accent-soft:#3d2a1c; --accent-fg:#1b1008;
+  --claude:#f09a62; --claude-soft:#3d2a1c; --gemini:#7aa7ff; --gemini-soft:#1b2b4a; --gpt:#4fd1a5; --gpt-soft:#123d30;
+  --warn:#f08a7e; --warn-soft:#3f2420; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font:16px/1.75 var(--font-body);
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0 56px}
+.wrap{max-width:980px;margin:0 auto}
+h1,h2,h3{font-family:var(--font-display);font-weight:400;text-wrap:balance;line-height:1.3;margin:0}
+h1{font-size:clamp(32px,6vw,52px)}
+h2{font-size:clamp(25px,4vw,32px);margin-bottom:6px}
+h3{font-size:20px}
+p{margin:0 0 10px}
+section{margin-top:56px}
+.lead{color:var(--muted);max-width:62ch}
+.eyebrow{font-size:13px;letter-spacing:.12em;color:var(--accent);font-weight:700}
+header{padding-block:44px 0}
+header p{color:var(--muted);font-size:18px;max-width:52ch;margin-top:12px}
+
+/* 탭 */
+.tabs{display:flex;gap:8px;margin-top:28px;flex-wrap:wrap}
+.tab{font:inherit;font-weight:700;font-size:17px;padding:10px 22px;border-radius:99px;border:2px solid var(--line);background:var(--surface);color:var(--muted);cursor:pointer}
+.tab[aria-selected="true"]{color:var(--accent-fg);border-color:var(--accent);background:var(--accent)}
+.tab:focus-visible,.copy:focus-visible{outline:3px solid var(--fg);outline-offset:2px}
+.guide[data-who="claude"]{--accent:var(--claude);--accent-soft:var(--claude-soft)}
+.guide[data-who="gemini"]{--accent:var(--gemini);--accent-soft:var(--gemini-soft)}
+.guide[data-who="gpt"]{--accent:var(--gpt);--accent-soft:var(--gpt-soft)}
+:root[data-who="gpt"]{--accent:var(--gpt)}
+:root[data-who="gemini"] .tab[aria-selected="true"]{background:var(--gemini);border-color:var(--gemini)}
+:root[data-who="gemini"]{--accent:var(--gemini)}
+:root[data-who="claude"]{--accent:var(--claude)}
+
+/* 시작 3단계 */
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:18px}
+.step{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:18px;min-width:0}
+.step .n{display:inline-grid;place-items:center;width:30px;height:30px;border-radius:50%;background:var(--accent);color:var(--accent-fg);font-weight:700;margin-bottom:8px}
+@media(max-width:760px){.steps{grid-template-columns:1fr}}
+
+/* 기능 카드 */
+.feats{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;margin-top:18px}
+.feat{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:20px;min-width:0;display:flex;flex-direction:column;gap:8px}
+.feat .top{display:flex;gap:12px;align-items:center}
+.ico{width:48px;height:48px;flex:none;border-radius:12px;background:var(--accent-soft);display:grid;place-items:center}
+.ico svg{width:28px;height:28px;stroke:var(--accent);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.feat p{color:var(--muted);margin:0;font-size:15px}
+.ex{margin-top:auto;background:var(--accent-soft);border-radius:10px;padding:12px 14px;font-size:14px;line-height:1.6;position:relative}
+.ex small{display:block;font-weight:700;color:var(--accent);margin-bottom:2px;font-size:12px;letter-spacing:.06em}
+.copy{margin-top:8px;font:inherit;font-size:13px;font-weight:700;border:1.5px solid var(--accent);color:var(--accent);background:transparent;border-radius:8px;padding:2px 12px;cursor:pointer}
+@media(max-width:700px){.feats{grid-template-columns:1fr}}
+
+/* 습관/주의 */
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:18px}
+.box{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:20px;min-width:0}
+.box.warn{background:var(--warn-soft);border-color:transparent}
+.box.warn h3{color:var(--warn)}
+.box ul{margin:10px 0 0;padding-left:20px}
+.box li{margin-bottom:6px}
+@media(max-width:700px){.cols{grid-template-columns:1fr}}
+
+/* 흐름 그림 */
+.flow{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px;margin-top:18px;overflow-x:auto}
+.flow svg{display:block;width:100%;min-width:560px;height:auto}
+footer{margin-top:48px;font-size:13px;color:var(--muted);border-top:1px solid var(--line);padding-top:16px}
+</style>
+
+<div class="wrap">
+<header>
+  <div class="eyebrow">유료 결제했다면 여기부터</div>
+  <h1>AI 프로 버전, 제대로 쓰기</h1>
+  <p>결제만 하고 무료처럼 쓰면 돈이 아깝습니다. 프로에서 열리는 기능과 바로 따라 할 수 있는 요청 문장을 정리했습니다.</p>
+  <div class="tabs" role="tablist" aria-label="서비스 선택">
+    <button class="tab" role="tab" id="tab-claude" data-who="claude" aria-selected="true">Claude 프로</button>
+    <button class="tab" role="tab" id="tab-gemini" data-who="gemini" aria-selected="false">Gemini AI 프로</button>
+    <button class="tab" role="tab" id="tab-gpt" data-who="gpt" aria-selected="false">ChatGPT 플러스</button>
+  </div>
+</header>
+
+<main id="out"></main>
+
+<footer>
+  기능 이름과 한도, 화면 위치는 수시로 바뀝니다. 메뉴가 다르면 도움말 검색창에 기능 이름을 넣어 찾으세요. 예시 문장은 복사해서 내 상황에 맞게 고쳐 쓰세요. AI가 만든 숫자, 인용, 성경 구절 위치는 반드시 직접 확인하세요.
+</footer>
+</div>
+
+<script>
+var ICONS={
+  folder:'<path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>',
+  search:'<circle cx="11" cy="11" r="7"/><path d="M21 21l-5-5"/>',
+  doc:'<path d="M6 3h8l4 4v14H6z"/><path d="M14 3v4h4M9 12h6M9 16h6"/>',
+  plug:'<path d="M9 3v5M15 3v5M6 8h12v3a6 6 0 0 1-12 0zM12 17v4"/>',
+  brain:'<path d="M12 4a4 4 0 0 0-4 4 3 3 0 0 0-2 5 3 3 0 0 0 3 4h3zM12 4a4 4 0 0 1 4 4 3 3 0 0 1 2 5 3 3 0 0 1-3 4h-3zM12 4v13"/>',
+  image:'<rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="2"/><path d="M21 17l-5-5-9 8"/>',
+  video:'<rect x="3" y="6" width="13" height="12" rx="2"/><path d="M16 10l5-3v10l-5-3"/>',
+  mail:'<rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/>',
+  book:'<path d="M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2zM4 19V5"/>',
+  gem:'<path d="M12 3l3 4 5 2-8 12L4 9l5-2z"/><path d="M4 9h16"/>',
+  code:'<path d="M8 8l-4 4 4 4M16 8l4 4-4 4M14 5l-4 14"/>',
+  tool:'<path d="M14 6a4 4 0 0 0 5 5l-9 9a2 2 0 0 1-3-3z"/>'
+};
+function ico(k){return '<span class="ico"><svg viewBox="0 0 24 24" aria-hidden="true">'+ICONS[k]+'</svg></span>'}
+
+var DATA={
+claude:{
+  title:'Claude 프로 제대로 쓰기',
+  lead:'Claude는 길고 정확한 글 작업, 자료 정리, 파일 만들기에 강합니다. 아래 순서로 세팅하면 쓸 때마다 같은 설명을 반복하지 않아도 됩니다.',
+  steps:[
+    ['내 정보와 말투 알려주기','설정에서 직업, 자주 하는 일, 원하는 말투를 적어 둡니다. 예: "한국어 존댓말, 목회자, 쉬운 표현 선호"'],
+    ['프로젝트 만들기','주제별 폴더(프로젝트)를 만들고 참고 자료와 지침을 넣어 둡니다. 설교, 주보, 교육 자료처럼 나눕니다.'],
+    ['모델과 생각 모드 고르기','가벼운 질문은 빠른 모델, 어려운 분석은 상위 모델이나 확장된 생각 모드를 씁니다.']
+  ],
+  feats:[
+    ['folder','프로젝트','한 주제의 자료와 지침을 모아 두면 새 대화를 열어도 맥락이 이어집니다.','이 프로젝트의 지침: 모든 답은 존댓말, 3문단 이내, 성경 구절은 개역개정 표기. 지금부터 이 원칙을 지켜 줘.'],
+    ['search','리서치(깊은 조사)','웹을 여러 번 찾아 출처가 달린 보고서로 정리해 줍니다. 몇 분 걸려도 괜찮은 조사에 씁니다.','다음 주제를 깊이 조사해서 출처와 함께 보고서로 정리해 줘: (주제). 서로 다른 의견도 함께 보여 줘.'],
+    ['doc','파일 만들기','워드 문서, 엑셀 표, 슬라이드 같은 파일을 대화 속에서 바로 만들고 내려받습니다.','아래 내용으로 A4 한 장짜리 안내문 워드 파일을 만들어 줘. 제목은 크게, 일정은 표로.'],
+    ['plug','내 도구 연결','구글 드라이브, 메일, 캘린더 등을 연결하면 내 자료를 읽고 답할 수 있습니다. 연결 범위는 직접 정합니다.','내 드라이브에서 지난달 회의록을 찾아 결정 사항만 다섯 줄로 요약해 줘.'],
+    ['brain','확장된 생각','어려운 문제는 더 오래 생각하게 하면 답이 안정됩니다. 단순 질문에는 켜지 않아도 됩니다.','천천히 단계별로 생각해서, 이 계획의 빈틈과 위험을 세 가지만 짚어 줘.'],
+    ['code','코드와 앱 만들기','프로그램을 직접 만들거나 고치게 할 수 있고, 만든 화면을 바로 미리 볼 수 있습니다.','간단한 출석 체크 웹페이지를 만들어 줘. 이름 입력, 체크, 인원 합계가 보이게.']
+  ],
+  flow:['자료 올리기','프로젝트에 저장','지침 정하기','결과 받기','수정 요청'],
+  habits:['한 번에 길게 시키지 말고 "초안 → 수정 → 마무리"로 나눠 요청합니다.','좋은 결과가 나오면 그 문장을 프로젝트 지침에 저장해 둡니다.','결과가 마음에 안 들면 처음부터 다시 쓰기보다 어디가 문제인지 한 줄로 알려 줍니다.','대화가 너무 길어지면 새 대화를 열고 요약만 가져갑니다.'],
+  warns:['출처와 숫자는 그럴듯하게 틀릴 수 있으니 직접 확인합니다.','연결한 도구에 개인정보나 교인 명단이 있으면 어디까지 읽게 할지 신중히 정합니다.','프로도 한도가 있습니다. 큰 작업은 몰아서 하지 말고 나눠서 합니다.']
+},
+gpt:{
+  title:'ChatGPT 플러스 제대로 쓰기',
+  lead:'ChatGPT는 대화, 이미지 만들기, 음성, 깊은 조사, 직접 일을 처리하는 에이전트 기능까지 한 곳에 모여 있는 만능형 도구입니다. 같은 구독으로 코딩 에이전트 Codex도 쓸 수 있습니다.',
+  steps:[
+    ['맞춤형 지침과 메모리 켜기','설정의 개인 맞춤 설정에 내 소개와 원하는 답변 방식을 적습니다. 메모리를 켜면 대화에서 알게 된 선호를 기억합니다.'],
+    ['프로젝트 만들기','주제별 폴더(프로젝트)에 파일과 지침을 넣어 둡니다. 설교, 주보, 교육 자료처럼 나눕니다.'],
+    ['모델 고르기','화면 위쪽 모델 이름에서 빠른 응답과 오래 생각하는 모델 중 고릅니다. 어려운 분석에는 오래 생각하는 쪽을 씁니다.']
+  ],
+  feats:[
+    ['folder','프로젝트','한 주제의 파일, 지침, 대화를 모아 두면 새 대화를 열어도 맥락이 이어집니다.','이 프로젝트의 지침: 모든 답은 존댓말, 핵심 세 줄 요약을 먼저 보여 줄 것, 확실하지 않은 내용은 모른다고 말할 것.'],
+    ['search','딥 리서치','웹을 폭넓게 찾아 출처가 달린 긴 보고서로 정리합니다. 몇 분 걸리는 조사에 씁니다. 요금제별 횟수 한도가 있습니다.','(주제)에 대해 최근 자료를 깊이 조사해서 목차가 있는 보고서로 만들어 줘. 출처 링크와 서로 다른 의견도 포함해 줘.'],
+    ['gem','나만의 GPT','역할과 지침을 저장한 나만의 도우미입니다. 자주 하는 일마다 하나씩 만들어 둡니다.','너는 교회 주보 편집자야. 내가 일정을 주면 두 줄 이내의 따뜻한 안내 문구로 바꿔 줘.'],
+    ['plug','앱 연결','Gmail, 구글 드라이브, 캘린더 같은 서비스를 연결하면 내 자료를 바탕으로 답합니다. 필요한 것만 켜세요.','내 드라이브에서 이번 주 회의 자료를 찾아 핵심만 다섯 줄로 요약해 줘.'],
+    ['image','이미지 만들기와 편집','설명만으로 그림을 만들고, 올린 사진을 고치거나 스타일을 바꿉니다. 글자가 들어간 그림도 비교적 잘 만듭니다.','밝은 수채화 느낌의 가을 야외 예배 포스터를 만들어 줘. 제목 글자는 "가을 감사예배"로.'],
+    ['tool','에이전트 기능','웹페이지를 직접 둘러보고 조사와 예약 같은 여러 단계 작업을 이어서 처리합니다. 중요한 단계에서는 확인을 요청합니다. 요금제에 따라 제공됩니다.','다음 주 수요일 서울에서 부산 가는 기차 시간을 알아보고 가장 편한 시간 세 개를 비교해 줘. 결제는 하지 마.']
+  ],
+  flow:['질문하기','모델 선택','자료 첨부','결과 받기','Canvas에서 고치기'],
+  habits:['한 번에 길게 시키지 말고 "초안 → 수정 → 마무리"로 나눕니다.','자주 쓰는 지침은 맞춤형 지침이나 프로젝트에 저장해 매번 쓰지 않게 합니다.','에이전트 기능은 처음에는 "결제는 하지 마"처럼 하지 않을 일을 함께 적습니다.','코딩이나 파일 작업은 Codex를 쓰면 내 폴더에서 직접 일합니다. 세 번째 페이지의 Codex 탭을 참고하세요.'],
+  warns:['메모리와 앱 연결은 개인 정보가 쌓이는 곳입니다. 필요 없는 항목은 지우고 연결은 필요한 만큼만 합니다.','민감한 개인 정보나 교인 명단은 입력하지 않는 편이 안전합니다.','숫자, 인용, 성경 구절 위치는 그럴듯하게 틀릴 수 있으니 직접 확인합니다.','기능별 한도와 제공 요금제가 자주 바뀝니다. 공식 안내를 확인하세요.']
+},
+gemini:{
+  title:'Gemini AI 프로 제대로 쓰기',
+  lead:'Gemini는 구글 서비스와 이어 쓸 때 힘이 큽니다. Gmail, 문서, 드라이브 안에서 바로 쓰고, 이미지와 영상 만들기도 한도가 늘어납니다.',
+  steps:[
+    ['구글 계정 확인','결제한 계정과 평소 쓰는 구글 계정이 같은지 확인합니다. 다르면 기능이 열리지 않을 수 있습니다.'],
+    ['Gem(나만의 도우미) 만들기','자주 하는 일마다 지침을 넣은 도우미를 만듭니다. 예: 주보 문구 도우미, 소식지 편집자'],
+    ['구글 앱 연결 켜기','Gmail, 드라이브, 캘린더를 연결하면 "내 메일에서 찾아 줘" 같은 요청이 됩니다.']
+  ],
+  feats:[
+    ['gem','Gem','역할과 지침을 저장한 나만의 도우미입니다. 매번 같은 설명을 쓰지 않아도 됩니다.','너는 교회 주보 편집자야. 내가 일정을 주면 두 줄 이내의 따뜻한 안내 문구로 바꿔 줘.'],
+    ['search','Deep Research','웹을 폭넓게 찾아 계획을 세우고 긴 보고서로 정리합니다. 구글 문서로 내보내기도 쉽습니다.','(주제)에 대해 최근 자료를 조사해서 목차가 있는 보고서로 만들어 줘. 출처 링크 포함.'],
+    ['mail','Gmail·문서·드라이브 안에서','메일 답장 초안, 문서 다듬기, 드라이브 파일 요약을 각 앱 안에서 바로 합니다.','이 메일에 정중하게 일정 변경을 요청하는 답장을 써 줘. 세 문장 이내.'],
+    ['book','NotebookLM 연동','올린 자료만 근거로 요약하고 질문에 답하는 학습 도구입니다. 프로에서는 한도가 늘어납니다.','올린 PDF 세 개를 근거로, 공통점과 차이점을 표로 정리해 줘.'],
+    ['image','이미지 만들기','설명만으로 그림을 만들고, 올린 사진을 고치거나 스타일을 바꿀 수 있습니다.','밝은 수채화 느낌의 가을 야외 예배 포스터 배경을 만들어 줘. 글자는 넣지 말고.'],
+    ['video','영상 만들기','짧은 영상을 만들 수 있습니다. 횟수 제한이 있고 길이가 짧아 보조 영상용으로 적당합니다.','잔잔한 호수에 해가 뜨는 8초 영상을 만들어 줘. 카메라는 천천히 앞으로.']
+  ],
+  flow:['요청하기','계획 확인','자료 수집','보고서 받기','문서로 내보내기'],
+  habits:['사진이나 파일을 올리고 "이 자료만 근거로 답해 줘"라고 범위를 정합니다.','자주 쓰는 요청은 Gem으로 저장해서 재사용합니다.','Deep Research는 계획을 먼저 보여 주므로, 실행 전에 방향을 고쳐 줍니다.','이미지는 "누구를, 어디서, 어떤 분위기로"를 구체적으로 적을수록 좋습니다.'],
+  warns:['실제 사람의 얼굴이나 저작권 있는 그림을 만들어 달라는 요청은 거절되거나 문제가 될 수 있습니다.','메일·드라이브를 연결하면 개인 자료를 읽게 되므로 공용 기기에서는 끄세요.','영상과 이미지 생성 한도는 하루 기준으로 정해져 있어 한꺼번에 많이 쓰면 막힙니다.']
+}};
+
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;')}
+function render(who){
+  var d=DATA[who], h='';
+  h+='<div class="guide" data-who="'+who+'">';
+  h+='<section><div class="eyebrow">'+({claude:'CLAUDE PRO',gemini:'GEMINI AI PRO',gpt:'CHATGPT PLUS'})[who]+'</div><h2>'+d.title+'</h2><p class="lead">'+d.lead+'</p></section>';
+  h+='<section><h2>먼저 세 가지만 설정하세요</h2><div class="steps">';
+  d.steps.forEach(function(s,i){h+='<div class="step"><span class="n">'+(i+1)+'</span><h3>'+s[0]+'</h3><p style="margin-top:6px;color:var(--muted);font-size:15px">'+s[1]+'</p></div>'});
+  h+='</div></section>';
+  h+='<section><h2>꼭 써 볼 기능 여섯 가지</h2><p class="lead">각 카드의 예시 문장을 복사해서 그대로 붙여 넣어 보세요.</p><div class="feats">';
+  d.feats.forEach(function(f,i){
+    h+='<div class="feat"><div class="top">'+ico(f[0])+'<h3>'+f[1]+'</h3></div><p>'+f[2]+'</p>'
+     +'<div class="ex"><small>이렇게 시켜 보세요</small><span id="ex-'+who+i+'">'+esc(f[3])+'</span><br><button class="copy" data-t="ex-'+who+i+'">복사</button></div></div>';
+  });
+  h+='</div></section>';
+  // flow
+  var n=d.flow.length,w=140,svg='<svg viewBox="0 0 '+(n*w+20)+' 90" role="img" aria-label="작업 흐름: '+d.flow.join(', ')+'">';
+  d.flow.forEach(function(t,i){
+    var x=10+i*w;
+    svg+='<rect x="'+x+'" y="18" width="116" height="52" rx="12" fill="var(--accent-soft)" stroke="var(--accent)" stroke-width="2"/>'
+      +'<text x="'+(x+58)+'" y="49" text-anchor="middle" font-size="14" font-weight="700" fill="var(--fg)" font-family="Noto Sans KR, sans-serif">'+t+'</text>';
+    if(i<n-1)svg+='<path d="M'+(x+120)+' 44h14m-5-5l5 5-5 5" stroke="var(--accent)" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>';
+  });
+  svg+='</svg>';
+  h+='<section><h2>일하는 흐름</h2><div class="flow">'+svg+'</div></section>';
+  h+='<section><div class="cols"><div class="box"><h3>이렇게 하면 결과가 좋아집니다</h3><ul>'+d.habits.map(function(x){return '<li>'+x+'</li>'}).join('')+'</ul></div>'
+    +'<div class="box warn"><h3>조심할 점</h3><ul>'+d.warns.map(function(x){return '<li>'+x+'</li>'}).join('')+'</ul></div></div></section>';
+  h+='</div>';
+  document.getElementById('out').innerHTML=h;
+}
+function pick(who){
+  document.documentElement.setAttribute('data-who',who);
+  ['claude','gemini','gpt'].forEach(function(k){document.getElementById('tab-'+k).setAttribute('aria-selected',k===who?'true':'false')});
+  render(who);
+  try{history.replaceState(null,'','#'+who)}catch(e){}
+}
+document.querySelectorAll('.tab').forEach(function(b){b.addEventListener('click',function(){pick(b.dataset.who)})});
+document.getElementById('out').addEventListener('click',function(e){
+  var b=e.target.closest('.copy'); if(!b)return;
+  var el=document.getElementById(b.dataset.t), txt=el.textContent;
+  function done(){b.textContent='복사됨';setTimeout(function(){b.textContent='복사'},1500)}
+  function fallback(){var r=document.createRange();r.selectNodeContents(el);var s=getSelection();s.removeAllRanges();s.addRange(r);b.textContent='선택됨 (Ctrl+C)'}
+  try{navigator.clipboard.writeText(txt).then(done,fallback)}catch(err){fallback()}
+});
+function fromHash(){return location.hash==='#gemini'?'gemini':(location.hash==='#gpt'?'gpt':'claude')}
+window.addEventListener('hashchange',function(){pick(fromHash())});
+pick(fromHash());
+</script>
+
+</html>

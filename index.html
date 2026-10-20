@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>:root{color-scheme:light}</style>
+<title>AI 시작 가이드</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Do+Hyeon&family=Noto+Sans+KR:wght@400;500;700&display=swap">
+<style>
+/* Layout: 왼쪽 사이드바(페이지 목록 + 현재 페이지의 하위 탭), 오른쪽 상단 얇은 바(이전/다음), 나머지는 선택한 페이지를 보여 주는 프레임. 좁은 화면에서는 사이드바가 서랍으로 열림 */
+:root{
+  --bg:#f2f6f8; --side:#e7eef3; --surface:#ffffff; --fg:#13212c; --muted:#556675; --line:#d1dce3;
+  --accent:#0b7a85; --accent-soft:#d3eef0; --accent-fg:#ffffff; --scrim:rgba(10,20,28,.45);
+  --font-display:'Do Hyeon','Noto Sans KR',sans-serif;
+  --font-body:'Noto Sans KR',system-ui,sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0e171e; --side:#111d26; --surface:#16232d; --fg:#e8eff3; --muted:#9fb0bc; --line:#26384a;
+  --accent:#3cc3cf; --accent-soft:#123c42; --accent-fg:#06262a; --scrim:rgba(0,0,0,.6); color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0e171e; --side:#111d26; --surface:#16232d; --fg:#e8eff3; --muted:#9fb0bc; --line:#26384a;
+  --accent:#3cc3cf; --accent-soft:#123c42; --accent-fg:#06262a; --scrim:rgba(0,0,0,.6); color-scheme:dark}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.6 var(--font-body)}
+.app{display:grid;grid-template-columns:300px minmax(0,1fr);height:100%}
+
+/* 사이드바 */
+.side{background:var(--side);border-right:1px solid var(--line);overflow-y:auto;
+  padding:22px 14px 22px max(16px,env(safe-area-inset-left,0px));display:flex;flex-direction:column;gap:6px;min-width:0}
+.brand{font-family:var(--font-display);font-size:26px;line-height:1.25;margin:0 0 2px}
+.brand-sub{color:var(--muted);font-size:13px;margin:0 0 14px}
+.nav{display:grid;grid-template-columns:32px minmax(0,1fr);gap:10px;text-align:left;width:100%;font:inherit;color:var(--fg);
+  background:transparent;border:1.5px solid transparent;border-radius:12px;padding:10px 10px;cursor:pointer}
+.nav:hover{background:var(--surface)}
+.nav .no{display:grid;place-items:center;width:30px;height:30px;border-radius:50%;background:var(--surface);border:1.5px solid var(--line);font-weight:700;font-size:14px;color:var(--muted)}
+.nav b{display:block;font-size:15px;line-height:1.35}
+.nav span.d{display:block;color:var(--muted);font-size:12.5px;line-height:1.5;margin-top:1px}
+.nav[aria-current="page"]{background:var(--surface);border-color:var(--accent)}
+.nav[aria-current="page"] .no{background:var(--accent);border-color:var(--accent);color:var(--accent-fg)}
+.subs{display:flex;flex-wrap:wrap;gap:6px;margin:2px 0 8px 52px}
+.chip{font:inherit;font-size:12.5px;font-weight:700;padding:3px 11px;border-radius:99px;border:1.5px solid var(--line);background:var(--surface);color:var(--muted);cursor:pointer}
+.chip[aria-pressed="true"]{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+.note{margin-top:auto;padding-top:14px;color:var(--muted);font-size:12px;line-height:1.6;border-top:1px dashed var(--line)}
+button:focus-visible,a:focus-visible{outline:3px solid var(--fg);outline-offset:2px}
+
+/* 본문 */
+.main{display:grid;grid-template-rows:auto minmax(0,1fr);min-width:0;height:100%}
+.bar{display:flex;align-items:center;gap:10px;padding:8px max(14px,env(safe-area-inset-right,0px)) 8px 14px;border-bottom:1px solid var(--line);background:var(--surface);min-width:0}
+.bar h1{font-family:var(--font-display);font-weight:400;font-size:18px;margin:0;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.btn{font:inherit;font-size:13px;font-weight:700;color:var(--accent);background:transparent;border:1.5px solid var(--accent);border-radius:9px;padding:4px 12px;cursor:pointer;text-decoration:none;white-space:nowrap}
+.btn[disabled]{opacity:.35;cursor:default}
+.menu{font-size:18px;line-height:1;padding:6px 11px}
+iframe{width:100%;height:100%;border:0;display:block;background:var(--bg)}
+.scrim{display:none}
+
+@media(max-width:860px){
+  .app{grid-template-columns:minmax(0,1fr)}
+  .side{position:fixed;z-index:20;top:0;bottom:0;left:0;width:min(86vw,330px);transform:translateX(-102%);transition:transform .22s ease;box-shadow:4px 0 24px rgba(0,0,0,.2)}
+  .app.open .side{transform:none}
+  .app.open .scrim{display:block;position:fixed;inset:0;z-index:10;background:var(--scrim)}
+  .bar .hide-s{display:none}
+}
+@media(min-width:861px){.app.collapsed{grid-template-columns:minmax(0,1fr)}.app.collapsed .side{display:none}}
+@media (prefers-reduced-motion:reduce){.side{transition:none}}
+</style>
+
+<div class="app" id="app">
+  <aside class="side" id="side" aria-label="페이지 목록">
+    <h2 class="brand">AI 시작 가이드</h2>
+    <p class="brand-sub">Claude · Gemini · ChatGPT와 터미널 입문</p>
+    <nav id="nav" aria-label="가이드 페이지"></nav>
+    <div class="note">그림은 구조를 설명하는 도식입니다. 요금, 한도, 메뉴 이름은 서비스가 자주 바꾸므로 설명 전에 공식 화면과 대조하세요.</div>
+  </aside>
+  <div class="scrim" id="scrim"></div>
+  <div class="main">
+    <div class="bar">
+      <button class="btn menu" id="menu" aria-label="사이드바 접기 또는 펼치기" title="사이드바 접기/펼치기" aria-expanded="true">☰</button>
+      <h1 id="title">AI 시작 가이드</h1>
+      <button class="btn" id="prev">이전</button>
+      <button class="btn" id="next">다음</button>
+      <a class="btn hide-s" id="ext" href="1-free-vs-pro.html" target="_blank" rel="noopener">새 탭에서 열기</a>
+    </div>
+    <iframe id="frame" title="가이드 본문" src="about:blank"></iframe>
+  </div>
+</div>
+
+<script>
+var PAGES=[
+ {f:'1-free-vs-pro.html',t:'무료와 프로, 무엇이 다른가',d:'요금제 차이를 쉬운 비유로 설명',subs:[]},
+ {f:'2-pro-guide.html',t:'AI 프로 제대로 쓰기',d:'결제한 뒤 꼭 써 볼 기능과 요청 문장',subs:[['claude','Claude',''],['gemini','Gemini','gemini'],['gpt','ChatGPT','gpt']]},
+ {f:'3-computer-control.html',t:'내 컴퓨터 제어하기',d:'Claude Code, Antigravity, Codex와 안전 수칙',subs:[['claude','Claude Code',''],['anti','Antigravity','anti'],['cdx','Codex','cdx']]},
+ {f:'4-terminal-basics.html',t:'터미널 첫걸음',d:'터미널, 설치 원리, 명령어, 용어 사전',subs:[['why','터미널이란','why'],['install','설치 원리','install'],['must','필수 프로그램','must'],['cmds','명령어','cmds'],['envvenv','.env와 venv','envvenv'],['words','용어 사전','words']]},
+ {f:'5-screen-tour.html',t:'Claude·Gemini·ChatGPT 화면 읽는 법',d:'사이드바, 사용량, 아티팩트, 사용자 지정',subs:[['claude','Claude',''],['gem','Gemini','gem'],['gpt','ChatGPT','gpt']]}
+];
+var cur=0, sub='';
+var $=function(id){return document.getElementById(id)};
+
+function url(i,s){return PAGES[i].f+(s?'#'+s:'')}
+function hashFor(){return '#p'+(cur+1)+(sub?'-'+sub:'')}
+
+function renderNav(){
+  var h='';
+  PAGES.forEach(function(p,i){
+    h+='<button class="nav" data-i="'+i+'"'+(i===cur?' aria-current="page"':'')+'><span class="no">'+(i+1)+'</span><span><b>'+p.t+'</b><span class="d">'+p.d+'</span></span></button>';
+    if(i===cur&&p.subs.length){
+      h+='<div class="subs" role="group" aria-label="이 페이지의 탭">';
+      p.subs.forEach(function(s){
+        var on=(sub===s[2]);
+        h+='<button class="chip" data-i="'+i+'" data-s="'+s[2]+'" aria-pressed="'+on+'">'+s[1]+'</button>';
+      });
+      h+='</div>';
+    }
+  });
+  $('nav').innerHTML=h;
+}
+function show(i,s,quiet){
+  cur=i; sub=s||'';
+  var u=url(cur,sub), fr=$('frame');
+  var base=fr.getAttribute('src')||'';
+  if(base.split('#')[0]===PAGES[cur].f){
+    try{fr.contentWindow.location.hash=sub?'#'+sub:''; if(!sub)fr.contentWindow.scrollTo(0,0)}catch(e){fr.src=u}
+  }else{fr.src=u}
+  fr.setAttribute('src',u);
+  $('title').textContent=(cur+1)+'. '+PAGES[cur].t;
+  $('ext').href=u;
+  $('prev').disabled=cur===0; $('next').disabled=cur===PAGES.length-1;
+  renderNav();
+  try{history.replaceState(null,'',hashFor())}catch(e){}
+  try{localStorage.setItem('ai-guide-last',hashFor())}catch(e){}
+  if(!quiet)closeDrawer();
+}
+function openDrawer(){$('app').classList.add('open');$('menu').setAttribute('aria-expanded','true')}
+function closeDrawer(){$('app').classList.remove('open');$('menu').setAttribute('aria-expanded','false')}
+
+$('nav').addEventListener('click',function(e){
+  var c=e.target.closest('.chip'), n=e.target.closest('.nav');
+  if(c){show(+c.dataset.i,c.dataset.s);return}
+  if(n){show(+n.dataset.i,'')}
+});
+$('prev').addEventListener('click',function(){if(cur>0)show(cur-1,'',true)});
+$('next').addEventListener('click',function(){if(cur<PAGES.length-1)show(cur+1,'',true)});
+function isNarrow(){return window.matchMedia('(max-width:860px)').matches}
+function setCollapsed(on){
+  $('app').classList.toggle('collapsed',on);
+  $('menu').setAttribute('aria-expanded',on?'false':'true');
+  try{localStorage.setItem('ai-guide-collapsed',on?'1':'0')}catch(e){}
+}
+$('menu').addEventListener('click',function(){
+  if(isNarrow()){$('app').classList.contains('open')?closeDrawer():openDrawer()}
+  else{setCollapsed(!$('app').classList.contains('collapsed'))}
+});
+$('scrim').addEventListener('click',closeDrawer);
+document.addEventListener('keydown',function(e){if(e.key==='Escape')closeDrawer()});
+
+function start(){
+  var h=location.hash, m=/^#p(\d)(?:-([\w]+))?$/.exec(h);
+  if(!m){try{m=/^#p(\d)(?:-([\w]+))?$/.exec(localStorage.getItem('ai-guide-last')||'')}catch(e){}}
+  var i=m?Math.min(Math.max(+m[1]-1,0),PAGES.length-1):0;
+  show(i,m&&m[2]?m[2]:'',true);
+}
+start();
+try{if(!isNarrow()&&localStorage.getItem('ai-guide-collapsed')==='1')setCollapsed(true)}catch(e){}
+</script>
+
+</html>
