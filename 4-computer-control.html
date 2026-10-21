@@ -90,6 +90,17 @@ header p{color:var(--muted);font-size:18px;max-width:54ch;margin-top:12px}
 .tbl tbody th{font-weight:700;white-space:nowrap}
 .tbl tr:last-child th,.tbl tr:last-child td{border-bottom:0}
 .tbl td.hl{background:var(--accent-soft)}
+.egcard{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:20px;margin-top:16px;min-width:0}
+.egcard h3{margin-bottom:4px}
+.egcard .goal{color:var(--muted);font-size:15px;margin:0 0 6px}
+.egs{margin:14px 0 0;padding:0;list-style:none;display:grid;gap:14px;counter-reset:e}
+.egs li{display:grid;grid-template-columns:32px minmax(0,1fr);gap:12px;counter-increment:e}
+.egs li::before{content:counter(e);display:grid;place-items:center;width:28px;height:28px;border-radius:50%;background:var(--accent);color:var(--accent-fg);font-weight:700;font-size:14px;margin-top:2px}
+.egs b{display:block;font-size:16px}
+.egs p{margin:2px 0 0;color:var(--muted);font-size:15px}
+.egs .ex{margin-top:8px}
+.result{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px;align-items:center;font-size:14px}
+.result .chip2{background:var(--accent-soft);color:var(--accent);font-weight:700;padding:2px 12px;border-radius:99px}
 .callout{background:var(--accent-soft);border-radius:12px;padding:14px 16px;margin-top:14px;font-size:15px}
 .callout b{color:var(--accent)}
 footer{margin-top:48px;font-size:13px;color:var(--muted);border-top:1px solid var(--line);padding-top:16px}
@@ -150,6 +161,50 @@ function ico(k){return '<div class="ico"><svg viewBox="0 0 24 24" aria-hidden="t
 
 var DATA={
 claude:{
+  post:[{
+    eb:'실제 예시',
+    title:'Claude Code로 이런 일을 합니다',
+    lead:'두 예시 모두 같은 순서를 따릅니다. 계획 먼저, 한 편만 시험, 전체 실행, 검수, 그다음 자동화입니다. 요청 문장은 복사해서 내 상황에 맞게 고쳐 쓰세요.',
+    html:`<div class="egcard">
+      <h3>예시 1. 설교 원고로 책자 만들기</h3>
+      <p class="goal">여러 편의 원고(워드나 글 파일)를 한 권의 소책자(PDF와 전자책)로 묶는 일입니다.</p>
+      <div class="result"><span><b>준비</b></span><span class="chip2">원고/ (복사본)</span><span class="chip2">결과/ (빈 폴더)</span><span>원본은 다른 곳에 따로 둡니다.</span></div>
+      <ol class="egs">
+        <li><div><b>읽고 정리만 하기</b><p>고치지 말고 현황부터 봅니다.</p>
+          <div class="ex"><small>요청</small><span id="exb1">원고 폴더의 파일을 읽고 목차 순서, 제목 형식, 빠졌거나 이상한 부분을 표로 정리해 줘. 읽기만 하고 아무것도 바꾸지 마.</span><br><button class="copy" data-t="exb1">복사</button></div></div></li>
+        <li><div><b>양식을 정하고 계획서 받기</b><p>크기, 글자, 쪽번호 같은 규칙을 말하고, 실행 전에 계획만 받습니다.</p>
+          <div class="ex"><small>요청</small><span id="exb2">계획 모드로 해 줘. A5 크기, 본문 11pt, 장 제목은 새 쪽에서 시작, 쪽번호는 아래 가운데, 표지와 목차 포함. 필요한 도구와 만드는 순서를 계획서로 먼저 보여 줘.</span><br><button class="copy" data-t="exb2">복사</button></div></div></li>
+        <li><div><b>한 편만 시험하기</b><p>전체를 돌리기 전에 첫 편으로 모양을 확인합니다.</p>
+          <div class="ex"><small>요청</small><span id="exb3">첫 번째 원고만 같은 양식으로 만들어 결과 폴더에 저장해 줘. 어떻게 보이는지 설명도 해 줘.</span><br><button class="copy" data-t="exb3">복사</button></div></div></li>
+        <li><div><b>전체 만들기</b><p>모양이 마음에 들면 나머지를 합칩니다.</p>
+          <div class="ex"><small>요청</small><span id="exb4">나머지 원고도 같은 양식으로 합쳐서 한 권의 PDF와 전자책(EPUB)으로 만들어 줘. 원본 파일은 건드리지 마.</span><br><button class="copy" data-t="exb4">복사</button></div></div></li>
+        <li><div><b>점검 목록 받기</b><p>고치는 것은 내가 확인한 뒤에 하도록 합니다.</p>
+          <div class="ex"><small>요청</small><span id="exb5">성경 구절 표기가 통일됐는지, 빠진 쪽이나 깨진 글자가 없는지 점검해서 목록으로만 알려 줘. 고치는 것은 내가 확인한 뒤에 해 줘.</span><br><button class="copy" data-t="exb5">복사</button></div></div></li>
+      </ol>
+      <div class="result"><span><b>결과</b></span><span class="chip2">책자.pdf</span><span class="chip2">책자.epub</span><span class="chip2">점검목록.md</span></div>
+      <div class="callout"><b>주의</b> 성경 구절과 인용, 통계는 AI가 틀릴 수 있으니 마지막 검수는 사람이 합니다. 표지 그림과 글꼴은 배포 전에 사용 허락 범위를 확인하세요. 변환에 필요한 도구가 없으면 Claude Code가 설치를 제안하는데, 무엇을 설치하는지 읽고 승인하세요.</div>
+    </div>
+    <div class="egcard">
+      <h3>예시 2. 유튜브에 자동으로 올리기</h3>
+      <p class="goal">주일 예배 영상 파일이 폴더에 들어오면 제목과 설명을 붙여 유튜브에 올리고, 끝나면 알림을 받는 일입니다.</p>
+      <div class="result"><span><b>핵심 규칙</b></span><span class="chip2">항상 비공개로 올리기</span><span>확인한 뒤 사람이 직접 공개합니다. API로 올리면 공개로도 올라갈 수 있어서 비공개를 코드에 고정합니다.</span></div>
+      <div class="result"><span><b>사람이 직접 할 일</b></span><span>구글 클라우드에서 YouTube 기능을 켜고 인증 파일을 만든 뒤 로그인에 동의하는 단계입니다. Claude Code가 안내하지만 로그인과 동의는 본인이 합니다.</span></div>
+      <ol class="egs">
+        <li><div><b>계획 모드로 시작</b><p>질문을 하나씩 받으며 계획을 세웁니다.</p>
+          <div class="ex"><small>요청</small><span id="exy1">계획 모드로 해 줘. 새 영상이 들어오는 폴더를 확인하다가 유튜브에 비공개로 올리는 프로그램을 만들고 싶어. 필요한 준비물과 순서를 계획서로 보여 주고, 질문은 하나씩 해 줘.</span><br><button class="copy" data-t="exy1">복사</button></div></div></li>
+        <li><div><b>제목과 설명 규칙 정하기</b><p>파일 이름에서 날짜를 읽어 제목을 만들게 합니다.</p>
+          <div class="ex"><small>요청</small><span id="exy2">파일 이름은 2026-10-18_주일예배.mp4 형식이야. 제목은 "날짜 주일예배", 설명 맨 위에는 본문 말씀 칸을 두고, 공개 설정은 항상 비공개로 고정해 줘.</span><br><button class="copy" data-t="exy2">복사</button></div></div></li>
+        <li><div><b>올리지 않고 미리 보기</b><p>실제 업로드 없이 어떤 설정으로 올릴지만 출력하는 시험 모드입니다.</p>
+          <div class="ex"><small>요청</small><span id="exy3">실제로 올리지 말고, 어떤 제목, 설명, 공개 설정으로 올릴지만 화면에 보여 주는 시험 모드를 만들어 줘.</span><br><button class="copy" data-t="exy3">복사</button></div></div></li>
+        <li><div><b>짧은 영상 하나로 시험 업로드</b><p>올린 뒤 유튜브 스튜디오에서 비공개인지 직접 확인합니다.</p>
+          <div class="ex"><small>요청</small><span id="exy4">짧은 테스트 영상 하나를 비공개로 올리고 결과 주소를 알려 줘.</span><br><button class="copy" data-t="exy4">복사</button></div></div></li>
+        <li><div><b>자동으로 돌리고 알림 받기</b><p>정해진 시간에 확인하고, 성공과 실패를 텔레그램으로 받습니다.</p>
+          <div class="ex"><small>요청</small><span id="exy5">매주 일요일 오후 3시에 폴더를 확인하는 예약 작업으로 등록해 줘. 올리면 결과 주소를, 실패하면 이유를 텔레그램으로 보내 줘.</span><br><button class="copy" data-t="exy5">복사</button></div></div></li>
+      </ol>
+      <div class="result"><span><b>결과</b></span><span class="chip2">영상 폴더에 넣기</span><span>→</span><span class="chip2">자동 업로드(비공개)</span><span>→</span><span class="chip2">알림</span><span>→</span><span class="chip2">확인 후 직접 공개</span></div>
+      <div class="callout"><b>주의</b> 인증 파일과 비밀 키는 별도 파일에 보관하고 깃허브 같은 곳에 올리지 마세요. 개발 중 상태의 앱은 로그인 승인이 일정 기간마다 만료될 수 있습니다. 하루 업로드 횟수 한도가 있고, 예약 작업은 컴퓨터가 켜져 있어야 돌아갑니다. 교인 얼굴과 음악 저작권은 공개 전에 확인하세요.</div>
+    </div>`
+  }],
   title:'Claude Code: 내 폴더에서 일하는 조수',
   lead:'Claude Code는 내가 정한 작업 폴더 안에서 파일을 읽고 고치고, 명령을 실행합니다. 데스크톱 앱의 Code 탭이나 터미널에서 쓰며, 하는 일마다 허락을 받는 방식이 기본입니다.',
   reach:[
