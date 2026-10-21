@@ -1,0 +1,267 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>:root{color-scheme:light}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>Antigravity IDE 화면 읽는 법</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Do+Hyeon&family=Noto+Sans+KR:wght@400;500;700&display=swap">
+<style>
+/* Layout: 실제 화면 캡처 위에 번호 표시를 올리고, 번호를 누르면 해당 구역에 테두리가 생기며 아래 설명과 짝을 이룸. 그 아래로 에이전트 패널, 확장 프로그램, 연습, 주의 순서 */
+:root{
+  --bg:#f2f6f8; --surface:#ffffff; --fg:#13212c; --muted:#556675; --line:#d6e0e6;
+  --accent:#2b66d9; --accent-soft:#dde8fb; --accent-fg:#ffffff;
+  --mark:#13212c; --mark-fg:#ffffff; --on:#e0442e; --on-bg:rgba(224,68,46,.14);
+  --ok:#1f7a4d; --ok-soft:#dcf1e5; --warn:#b4372b; --warn-soft:#fbe3df;
+  --font-display:'Do Hyeon','Noto Sans KR',sans-serif;
+  --font-body:'Noto Sans KR',system-ui,sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0e171e; --surface:#16232d; --fg:#e8eff3; --muted:#9fb0bc; --line:#26384a;
+  --accent:#7aa7ff; --accent-soft:#1b2b4a; --accent-fg:#0b1630;
+  --mark:#f2f6f8; --mark-fg:#0e171e; --on:#ff7a68; --on-bg:rgba(255,122,104,.18);
+  --ok:#6fd3a0; --ok-soft:#173a2a; --warn:#f08a7e; --warn-soft:#3f2420; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0e171e; --surface:#16232d; --fg:#e8eff3; --muted:#9fb0bc; --line:#26384a;
+  --accent:#7aa7ff; --accent-soft:#1b2b4a; --accent-fg:#0b1630;
+  --mark:#f2f6f8; --mark-fg:#0e171e; --on:#ff7a68; --on-bg:rgba(255,122,104,.18);
+  --ok:#6fd3a0; --ok-soft:#173a2a; --warn:#f08a7e; --warn-soft:#3f2420; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font:16px/1.75 var(--font-body);
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0 56px}
+.wrap{max-width:1040px;margin:0 auto}
+h1,h2,h3{font-family:var(--font-display);font-weight:400;text-wrap:balance;line-height:1.3;margin:0}
+h1{font-size:clamp(32px,6vw,52px)}
+h2{font-size:clamp(25px,4vw,32px);margin-bottom:6px}
+h3{font-size:20px}
+p{margin:0 0 10px}
+section{margin-top:56px;scroll-margin-top:12px}
+.lead{color:var(--muted);max-width:66ch}
+.eyebrow{font-size:13px;letter-spacing:.12em;color:var(--accent);font-weight:700}
+code{font-family:Consolas,'D2Coding',monospace;font-size:.92em;background:var(--accent-soft);color:var(--accent);padding:1px 6px;border-radius:5px}
+header{padding-block:44px 0}
+header p{color:var(--muted);font-size:18px;max-width:58ch;margin-top:12px}
+.toc{display:flex;flex-wrap:wrap;gap:8px;margin-top:22px}
+.toc a{font-size:14px;font-weight:700;color:var(--accent);background:var(--accent-soft);padding:4px 14px;border-radius:99px;text-decoration:none}
+a:focus-visible,button:focus-visible,input:focus-visible{outline:3px solid var(--fg);outline-offset:2px}
+
+/* 캡처와 번호 */
+.tools{display:flex;gap:14px;align-items:center;flex-wrap:wrap;margin-top:18px;font-size:14px;color:var(--muted)}
+.tools label{display:flex;gap:6px;align-items:center;cursor:pointer}
+.shotwrap{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:10px;margin-top:10px;overflow-x:auto}
+.shot{position:relative;min-width:780px;line-height:0}
+.shot img{width:100%;height:auto;display:block;border-radius:8px}
+.hs{position:absolute;transform:translate(-50%,-50%);width:26px;height:26px;border-radius:50%;border:2px solid var(--mark-fg);background:var(--mark);color:var(--mark-fg);font:700 13px/1 var(--font-body);cursor:pointer;padding:0;display:grid;place-items:center;box-shadow:0 1px 4px rgba(0,0,0,.45)}
+.hs.on{background:var(--on);color:#fff;border-color:#fff}
+.shot.hide .hs{display:none}
+.hl{position:absolute;border:3px solid var(--on);background:var(--on-bg);border-radius:6px;pointer-events:none}
+.cap{font-size:13px;color:var(--muted);margin-top:8px}
+
+.items{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px}
+.item{display:grid;grid-template-columns:30px minmax(0,1fr);gap:12px;text-align:left;font:inherit;background:var(--surface);border:1.5px solid var(--line);border-radius:12px;padding:12px 14px;cursor:pointer;color:var(--fg);min-width:0}
+.item .num{display:grid;place-items:center;width:28px;height:28px;border-radius:50%;background:var(--mark);color:var(--mark-fg);font-weight:700;font-size:14px}
+.item.on{border-color:var(--on)} .item.on .num{background:var(--on);color:#fff}
+.item b{display:block;font-size:16px}
+.item .d{display:block;color:var(--muted);font-size:14px;line-height:1.65;margin-top:2px}
+@media(max-width:760px){.items{grid-template-columns:1fr}}
+
+/* 구조 그림 */
+.fig{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px;margin-top:16px;overflow-x:auto}
+.fig svg{display:block;width:100%;min-width:560px;height:auto}
+.fig text{font-family:'Noto Sans KR',sans-serif}
+
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:14px;margin-top:16px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:18px;min-width:0}
+.card p{color:var(--muted);font-size:15px;margin:6px 0 0}
+.steps{display:grid;gap:12px;margin:16px 0 0;padding:0;list-style:none;counter-reset:s}
+.steps li{display:grid;grid-template-columns:32px minmax(0,1fr);gap:12px;counter-increment:s}
+.steps li::before{content:counter(s);display:grid;place-items:center;width:28px;height:28px;border-radius:50%;background:var(--accent);color:var(--accent-fg);font-weight:700;font-size:14px;margin-top:2px}
+.steps b{display:block}
+.steps span.d{color:var(--muted);font-size:15px}
+.ex{background:var(--accent-soft);border-radius:10px;padding:12px 14px;margin-top:10px;font-size:14px;line-height:1.7}
+.ex small{display:block;font-weight:700;color:var(--accent);font-size:12px;letter-spacing:.06em;margin-bottom:2px}
+.copy{margin-top:8px;font:inherit;font-size:13px;font-weight:700;border:1.5px solid var(--accent);color:var(--accent);background:transparent;border-radius:8px;padding:2px 12px;cursor:pointer}
+.tbl{overflow-x:auto;background:var(--surface);border:1px solid var(--line);border-radius:14px;margin-top:16px}
+.tbl table{border-collapse:collapse;width:100%;min-width:560px}
+.tbl th,.tbl td{padding:12px 16px;text-align:left;vertical-align:top;border-bottom:1px solid var(--line);font-size:15px}
+.tbl thead th{font-family:var(--font-display);font-weight:400;font-size:17px}
+.tbl tbody th{font-weight:700;white-space:nowrap}
+.tbl tr:last-child th,.tbl tr:last-child td{border-bottom:0}
+.box{border-radius:14px;padding:18px 20px;margin-top:16px}
+.box.warn{background:var(--warn-soft)} .box.warn h3{color:var(--warn)}
+.box.ok{background:var(--ok-soft)} .box.ok h3{color:var(--ok)}
+.box ul{margin:8px 0 0;padding-left:20px} .box li{margin-bottom:6px}
+footer{margin-top:48px;font-size:13px;color:var(--muted);border-top:1px solid var(--line);padding-top:16px}
+</style>
+
+<div class="wrap">
+<header>
+  <div class="eyebrow">실제 화면으로 배우기</div>
+  <h1>Antigravity IDE 화면 읽는 법</h1>
+  <p>Antigravity IDE의 실제 작업 화면입니다. 번호를 눌러 보며 어느 자리가 무슨 일을 하는지 익혀 보세요.</p>
+  <nav class="toc" aria-label="목차">
+    <a href="#overview">화면 전체</a><a href="#layout">구역 나누기</a><a href="#agent">에이전트 패널</a><a href="#ext">확장 프로그램</a><a href="#try">연습</a><a href="#safe">주의</a>
+  </nav>
+</header>
+
+<section id="overview">
+  <div class="eyebrow">1. 화면 전체</div>
+  <h2>번호를 눌러 보세요</h2>
+  <p class="lead">확장 프로그램을 살펴보며 에이전트에게 경고 표시 처리법을 묻는 순간의 화면입니다. 아래 그림의 번호나 아래쪽 설명 카드를 누르면 짝이 되는 구역에 빨간 테두리가 나타납니다.</p>
+  <div class="tools"><label><input type="checkbox" id="showNums" checked> 번호 표시</label><span id="selInfo">선택한 번호가 없습니다</span></div>
+  <div class="shotwrap"><div class="shot" id="shot">
+    <img src="img/antigravity-ide.png" width="1670" height="898" alt="Antigravity IDE 실제 화면. 왼쪽에 확장 프로그램 목록, 가운데에 편집기와 터미널, 오른쪽에 에이전트 대화창이 있고 맨 아래에 상태 표시줄이 있다.">
+  </div></div>
+  <div class="cap">실제 작업 화면입니다. 폴더 이름(ai_video)과 설치한 확장 프로그램 목록이 보입니다.</div>
+  <div class="items" id="items"></div>
+</section>
+
+<section id="layout">
+  <div class="eyebrow">2. 구역 나누기</div>
+  <h2>화면은 크게 네 구역입니다</h2>
+  <p class="lead">VS Code를 써 보셨다면 거의 같은 모양입니다. 달라지는 곳은 오른쪽의 에이전트 패널입니다.</p>
+  <div class="fig">
+    <svg viewBox="0 0 700 330" role="img" aria-label="화면 구역 도식: 왼쪽 활동 막대와 사이드바, 가운데 편집기와 터미널, 오른쪽 에이전트 패널, 맨 아래 상태 표시줄">
+      <rect x="4" y="4" width="692" height="322" rx="12" fill="var(--surface)" stroke="var(--line)" stroke-width="2"/>
+      <rect x="4" y="4" width="692" height="30" rx="12" fill="var(--accent-soft)"/><text x="350" y="24" text-anchor="middle" font-size="13" font-weight="700" fill="var(--accent)">위쪽: 메뉴와 창 배치 버튼</text>
+      <rect x="12" y="42" width="30" height="250" rx="6" fill="var(--line)"/><text x="27" y="170" text-anchor="middle" font-size="11" fill="var(--muted)" transform="rotate(-90 27 170)">활동 막대</text>
+      <rect x="48" y="42" width="170" height="250" rx="8" fill="var(--accent-soft)" stroke="var(--accent)" stroke-width="2"/><text x="133" y="150" text-anchor="middle" font-size="15" font-weight="700" fill="var(--fg)">사이드바</text><text x="133" y="172" text-anchor="middle" font-size="12" fill="var(--muted)">파일 · 검색 · 확장 프로그램</text>
+      <rect x="224" y="42" width="220" height="150" rx="8" fill="var(--surface)" stroke="var(--accent)" stroke-width="2"/><text x="334" y="112" text-anchor="middle" font-size="15" font-weight="700" fill="var(--fg)">편집기</text><text x="334" y="134" text-anchor="middle" font-size="12" fill="var(--muted)">파일을 열어 보고 고침</text>
+      <rect x="224" y="198" width="220" height="94" rx="8" fill="var(--surface)" stroke="var(--accent)" stroke-width="2"/><text x="334" y="240" text-anchor="middle" font-size="15" font-weight="700" fill="var(--fg)">터미널</text><text x="334" y="262" text-anchor="middle" font-size="12" fill="var(--muted)">명령이 실행되는 곳</text>
+      <rect x="450" y="42" width="236" height="250" rx="8" fill="var(--accent)"/><text x="568" y="150" text-anchor="middle" font-size="16" font-weight="700" fill="var(--accent-fg)">에이전트 패널</text><text x="568" y="174" text-anchor="middle" font-size="12" fill="var(--accent-fg)">AI에게 일을 시키는 대화창</text>
+      <rect x="4" y="298" width="692" height="24" rx="8" fill="var(--accent-soft)"/><text x="350" y="315" text-anchor="middle" font-size="12" font-weight="700" fill="var(--accent)">맨 아래: 상태 표시줄 (Git 브랜치, 오류 수, 설정)</text>
+    </svg>
+  </div>
+</section>
+
+<section id="agent">
+  <div class="eyebrow">3. 에이전트 패널</div>
+  <h2>AI에게 일을 시키는 곳</h2>
+  <p class="lead">화면 오른쪽의 "Agent" 창입니다. 채팅창처럼 보이지만, 내 폴더의 파일을 읽고 고치며 터미널 명령까지 실행하는 에이전트와 대화하는 곳입니다.</p>
+  <div class="cards">
+    <div class="card"><h3>대화와 사진 첨부</h3><p>이 화면의 첫 메시지처럼 캡처한 사진을 붙여 질문할 수 있습니다. 오류가 나면 화면을 캡처해 보여 주세요.</p></div>
+    <div class="card"><h3>"Thinking" 표시</h3><p>에이전트가 생각 중이라는 뜻입니다. 답이 나오기 전까지 기다리면 되고, 엉뚱한 방향이면 빨간 정지 버튼을 누릅니다.</p></div>
+    <div class="card"><h3>입력창의 @와 /</h3><p><code>@</code>를 치면 파일이나 폴더를 콕 집어 지정하고, <code>/</code>를 치면 동작 목록이 나옵니다.</p></div>
+    <div class="card"><h3>모델 선택</h3><p>입력창 왼쪽 아래에 <code>Claude Sonnet 4.6 (Thinking)</code>이 보입니다. 구글이 만든 도구 안에서 Anthropic의 Claude를 고른 모습입니다. 눌러서 다른 모델로 바꿀 수 있습니다.</p></div>
+  </div>
+  <div class="box ok"><h3>이 화면이 보여 주는 것</h3><ul>
+    <li>Antigravity는 한 회사의 AI에 묶여 있지 않고, 모델 선택 메뉴에서 여러 회사의 모델을 고를 수 있습니다.</li>
+    <li>(Thinking)이 붙은 모델은 답하기 전에 더 오래 생각하는 방식입니다. 어려운 일에 쓰고, 간단한 일에는 빠른 모델을 쓰면 한도를 아낄 수 있습니다.</li>
+  </ul></div>
+  <h3 style="margin-top:28px">처음 일을 시킬 때의 순서</h3>
+  <ol class="steps">
+    <li><div><b>작업할 폴더를 엽니다</b><span class="d">File 메뉴에서 폴더 열기를 고릅니다. AI가 만지는 범위가 이 폴더 안으로 정해집니다.</span></div></li>
+    <li><div><b>입력창에 하고 싶은 일을 씁니다</b><span class="d">처음에는 "계획서부터 써 줘"처럼 실행 전에 계획만 받는 요청이 안전합니다.</span></div></li>
+    <li><div><b>계획서와 승인 요청을 읽습니다</b><span class="d">터미널 명령을 실행하기 전에 승인을 묻도록 설정해 두었다면, 내용을 읽고 허락합니다.</span></div></li>
+    <li><div><b>무엇이 바뀌었는지 확인합니다</b><span class="d">편집기에서 바뀐 파일을 열어 보고, 소스 제어 아이콘의 숫자(변경된 파일 수)로도 확인합니다.</span></div></li>
+  </ol>
+</section>
+
+<section id="ext">
+  <div class="eyebrow">4. 확장 프로그램</div>
+  <h2>화면의 경고 삼각형은 무슨 뜻일까</h2>
+  <p class="lead">이 화면의 왼쪽은 확장 프로그램 목록입니다. 확장 프로그램은 편집기에 기능을 덧붙이는 부품입니다. 그림에는 두 가지가 눈에 띕니다.</p>
+  <div class="tbl"><table>
+    <thead><tr><th>보이는 것</th><th>뜻</th><th>어떻게 할까</th></tr></thead>
+    <tbody>
+      <tr><th>노란 삼각형 알림<br><small>Invalid extensions detected</small></th><td>유효하지 않거나 이 도구와 맞지 않는 확장 프로그램이 있다는 알림입니다.</td><td><b>Show</b>를 눌러 목록을 보고, 쓰지 않는 것은 제거합니다. 어떻게 처리할지 모르겠다면 이 화면을 캡처해 에이전트에게 물어보세요(이 화면 그대로입니다).</td></tr>
+      <tr><th>"Open VSX를 마켓플레이스로 씁니다" 안내</th><td>Antigravity는 확장 프로그램을 마이크로소프트 VS Code 마켓이 아니라 Open VSX라는 다른 마켓에서 받습니다.</td><td>VS Code에서 쓰던 확장이 없거나 버전이 다를 수 있습니다. 마켓 설정은 안내 속 설정 링크에서 바꿀 수 있습니다.</td></tr>
+      <tr><th>톱니 아이콘</th><td>그 확장 프로그램의 설정과 관리(비활성화, 제거) 메뉴입니다.</td><td>이상한 확장은 여기서 끄거나 지웁니다.</td></tr>
+      <tr><th>추천 표시<br><small>recommended based on files you recently opened</small></th><td>최근 연 파일을 보고 편집기가 권하는 확장입니다. 마크다운 파일을 열어서 markdownlint가 추천된 경우입니다.</td><td>필요할 때만 Install을 누릅니다.</td></tr>
+    </tbody>
+  </table></div>
+  <p class="lead" style="margin-top:14px">설치 목록에서 알아볼 만한 것: <b>Korean Language Pack</b>(화면을 한국어로), <b>PowerShell</b>(PowerShell 파일 편집 지원), <b>AG Quota Butler</b>(Antigravity 모델 사용량을 실시간으로 보여 주는 확장. 외부 개발자가 만든 것).</p>
+</section>
+
+<section id="try">
+  <div class="eyebrow">5. 연습</div>
+  <h2>이 화면에서 바로 해 볼 요청</h2>
+  <p class="lead">모두 읽기나 계획 위주라 안전합니다. 에이전트 입력창에 붙여 넣어 보세요.</p>
+  <div class="cards" id="exlist" style="grid-template-columns:repeat(auto-fit,minmax(300px,1fr))"></div>
+</section>
+
+<section id="safe">
+  <div class="eyebrow">6. 주의</div>
+  <h2>쓰기 전에 알아 둘 점</h2>
+  <div class="box warn"><h3>안전 수칙</h3><ul>
+    <li>확장 프로그램은 내 컴퓨터의 권한으로 동작합니다. 모르는 게시자의 확장은 설치하지 마세요. 설치 전에 게시자와 설치 수를 확인하세요.</li>
+    <li>터미널 명령 실행을 "자동"으로 두면 삭제 명령도 실행될 수 있습니다. 처음에는 "매번 검토 요청"으로 두세요.</li>
+    <li>화면을 캡처해 AI나 다른 사람에게 보낼 때는 폴더 경로, 계정 사진, 키와 비밀번호가 찍혀 있지 않은지 먼저 확인하세요.</li>
+    <li>중요한 폴더는 작업 전에 다른 곳에 복사해 두세요.</li>
+  </ul></div>
+</section>
+
+<footer>
+  화면 구성과 메뉴 이름은 Antigravity 버전에 따라 달라질 수 있습니다. 번호 설명 중 일부(상태 표시줄의 작업 영역 이름, 확장이 표시하는 항목)는 화면 모양으로 추정한 것이라 실제 이름과 다를 수 있습니다.
+</footer>
+</div>
+
+<script>
+var IW=1670, IH=898;
+/* x,y,w,h = 캡처 안의 영역(픽셀). mx,my = 번호 표시 위치 */
+var REG=[
+ {t:'메뉴와 창 배치 버튼',d:'File, Edit 같은 메뉴는 VS Code와 거의 같습니다. 오른쪽 위의 네모 버튼들은 왼쪽 사이드바, 아래 터미널, 오른쪽 에이전트 패널을 켜고 끄는 배치 스위치입니다. 화면이 답답하면 여기서 접으세요.',x:38,y:6,w:355,h:26,mx:392,my:19},
+ {t:'활동 막대',d:'맨 왼쪽 세로 아이콘줄입니다. 위에서부터 파일 탐색기, 검색, 소스 제어(Git, 숫자는 변경된 파일 수) 등이 있고, 지금은 확장 프로그램 아이콘이 선택된 상태입니다. 아이콘에 마우스를 올리면 이름이 나옵니다.',x:0,y:38,w:37,h:332,mx:18,my:392},
+ {t:'왼쪽 사이드바',d:'활동 막대에서 고른 항목의 내용이 펼쳐지는 곳입니다. 지금은 확장 프로그램 화면입니다. 파일 탐색기를 고르면 폴더 안의 파일 목록이 나옵니다.',x:38,y:38,w:402,h:78,mx:430,my:48},
+ {t:'경고 알림과 마켓 안내',d:'"Invalid extensions detected"는 잘못되었거나 맞지 않는 확장이 있다는 알림입니다. Show로 목록을 봅니다. 아래 문장은 확장을 Open VSX라는 마켓에서 받는다는 안내입니다.',x:45,y:108,w:388,h:76,mx:439,my:110},
+ {t:'설치된 확장 목록',d:'설치된 확장이 24개입니다. 노란 삼각형은 경고 표시이고 톱니는 설정·관리입니다. 한국어 언어팩, PowerShell, Antigravity 사용량 확인 확장 등이 보입니다. 쓰지 않는 것은 정리하세요.',x:40,y:190,w:400,h:688,mx:430,my:205},
+ {t:'편집기 영역',d:'파일이나 확장 프로그램 설명 같은 내용을 탭으로 엽니다. 지금은 markdownlint 확장의 상세 화면이고, 최근 연 파일을 보고 추천된 확장입니다. 바뀐 파일을 확인하는 곳도 여기입니다.',x:442,y:38,w:298,h:570,mx:732,my:48},
+ {t:'터미널',d:'PowerShell 창입니다. 현재 위치(PS D:\\Antigravity\\ai_video>)가 보입니다. 직접 명령을 쳐도 되고, 에이전트가 실행하는 명령도 여기에 나타납니다.',x:442,y:615,w:298,h:265,mx:732,my:626},
+ {t:'에이전트 패널 위쪽 줄',d:'"Agent" 제목 오른쪽에 새 대화(+), 지난 대화 기록(시계), 더보기(...), 닫기(×) 버튼이 있습니다. 주제가 바뀌면 새 대화를 여는 것이 좋습니다.',x:742,y:38,w:918,h:34,mx:1604,my:55},
+ {t:'대화 영역',d:'내가 보낸 메시지(캡처 사진 첨부 가능)와 에이전트의 답이 쌓입니다. "Thinking"은 생각 중이라는 표시입니다. 지금은 경고 표시를 어떻게 처리하냐고 묻고 에이전트가 답을 쓰는 중입니다.',x:750,y:86,w:905,h:195,mx:1160,my:140},
+ {t:'입력창',d:'"Ask anything, @ to mention, / for actions"라고 적혀 있습니다. 무엇이든 질문하고, @로 파일이나 폴더를 지정하고, /로 동작을 고릅니다. 위쪽 작은 아이콘들로 첨부나 도구를 켭니다.',x:750,y:790,w:905,h:84,mx:1160,my:808},
+ {t:'모델 선택',d:'"Claude Sonnet 4.6 (Thinking)"은 지금 쓰는 모델입니다. 구글 도구 안에서 Anthropic의 Claude를 고른 모습입니다. 눌러서 다른 모델로 바꿉니다. (Thinking)은 오래 생각하는 방식입니다.',x:783,y:840,w:170,h:20,mx:773,my:850},
+ {t:'정지 버튼',d:'빨간 네모는 에이전트가 일하는 중에 멈추게 하는 버튼입니다. 엉뚱한 방향으로 가거나 위험해 보이면 바로 누르세요.',x:1630,y:838,w:26,h:26,mx:1625,my:850},
+ {t:'상태 표시줄',d:'맨 아래 파란 줄입니다. 왼쪽 main*은 Git 브랜치 이름이고 *는 저장하지 않은 변경이 있다는 뜻입니다. 오류와 경고 개수(0, 0)도 보입니다. 오른쪽 "Antigravity - Settings"를 누르면 설정이 열립니다.',x:0,y:881,w:1670,h:17,mx:1560,my:872}
+];
+var sel=0;
+function $(id){return document.getElementById(id)}
+function pct(v,t){return (v/t*100).toFixed(3)+'%'}
+(function build(){
+  var shot=$('shot'), items='';
+  REG.forEach(function(r,i){
+    var n=i+1;
+    var b=document.createElement('button');
+    b.className='hs'; b.dataset.n=n; b.textContent=n; b.setAttribute('aria-label',n+'번 '+r.t);
+    b.style.left=pct(r.mx,IW); b.style.top=pct(r.my,IH);
+    shot.appendChild(b);
+    items+='<button class="item" data-n="'+n+'"><span class="num">'+n+'</span><span><b>'+r.t+'</b><span class="d">'+r.d.replace(/&/g,'&amp;').replace(/</g,'&lt;')+'</span></span></button>';
+  });
+  $('items').innerHTML=items;
+})();
+function select(n){
+  sel=(sel===n)?0:n;
+  var old=document.querySelector('.hl'); if(old)old.remove();
+  document.querySelectorAll('.hs,.item').forEach(function(e){e.classList.toggle('on',+e.dataset.n===sel)});
+  if(sel){
+    var r=REG[sel-1], h=document.createElement('div');
+    h.className='hl';
+    h.style.left=pct(r.x,IW); h.style.top=pct(r.y,IH); h.style.width=pct(r.w,IW); h.style.height=pct(r.h,IH);
+    $('shot').appendChild(h);
+    $('selInfo').textContent=sel+'번 '+REG[sel-1].t;
+  }else{ $('selInfo').textContent='선택한 번호가 없습니다'; }
+}
+document.addEventListener('click',function(e){
+  var t=e.target.closest('.hs,.item'); if(t){
+    var n=+t.dataset.n, wasSel=(sel===n);
+    select(n);
+    if(t.classList.contains('item')&&sel){ $('shot').scrollIntoView({behavior:'smooth',block:'center'}); }
+    return;
+  }
+  var c=e.target.closest('.copy'); if(!c)return;
+  var el=$(c.dataset.t), txt=el.textContent;
+  function done(){c.textContent='복사됨';setTimeout(function(){c.textContent='복사'},1500)}
+  function fb(){var r=document.createRange();r.selectNodeContents(el);var s=getSelection();s.removeAllRanges();s.addRange(r);c.textContent='선택됨 (Ctrl+C)'}
+  try{navigator.clipboard.writeText(txt).then(done,fb)}catch(err){fb()}
+});
+$('showNums').addEventListener('change',function(){$('shot').classList.toggle('hide',!this.checked)});
+
+var EX=[
+ ['경고 알림 이해하기','이 화면에서 직접 물었던 질문입니다. 지우기 전에 설명부터 받습니다.','이 화면의 "Invalid extensions detected" 경고가 무슨 뜻인지 쉽게 설명하고, 어떻게 처리하면 되는지 순서대로 알려 줘. 아직 아무것도 지우지 마.'],
+ ['폴더 구조 파악','읽기만 하는 요청은 가장 안전합니다.','지금 열려 있는 폴더의 파일 구조를 표로 보여 줘. 읽기만 하고 아무것도 바꾸지 마.'],
+ ['확장 프로그램 정리 목록','삭제는 내가 직접 하도록 목록만 받습니다.','설치된 확장 프로그램 중 내가 안 쓸 것 같은 것을 이유와 함께 목록으로만 알려 줘. 삭제는 내가 직접 할게.'],
+ ['계획서부터 받기','큰 작업은 계획을 먼저 보고 승인합니다.','계획서부터 써 줘. 이 폴더의 페이지 하나에 새 섹션을 추가하는 계획만 보여 주고, 내가 승인하면 진행해.']
+];
+var eh='';
+EX.forEach(function(x,i){eh+='<div class="card"><h3>'+x[0]+'</h3><p>'+x[1]+'</p><div class="ex"><small>복사해서 써 보세요</small><span id="ex'+i+'">'+x[2]+'</span><br><button class="copy" data-t="ex'+i+'">복사</button></div></div>'});
+$('exlist').innerHTML=eh;
+</script>
+
+</html>
