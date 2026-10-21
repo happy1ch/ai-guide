@@ -83,6 +83,15 @@ header p{color:var(--muted);font-size:18px;max-width:54ch;margin-top:12px}
 .box ul{margin:10px 0 0;padding-left:20px}
 .box li{margin-bottom:6px}
 @media(max-width:700px){.cols{grid-template-columns:1fr}}
+.tbl{overflow-x:auto;background:var(--surface);border:1px solid var(--line);border-radius:14px;margin-top:16px}
+.tbl table{border-collapse:collapse;width:100%;min-width:640px}
+.tbl th,.tbl td{padding:12px 16px;text-align:left;vertical-align:top;border-bottom:1px solid var(--line);font-size:15px}
+.tbl thead th{font-family:var(--font-display);font-weight:400;font-size:17px}
+.tbl tbody th{font-weight:700;white-space:nowrap}
+.tbl tr:last-child th,.tbl tr:last-child td{border-bottom:0}
+.tbl td.hl{background:var(--accent-soft)}
+.callout{background:var(--accent-soft);border-radius:12px;padding:14px 16px;margin-top:14px;font-size:15px}
+.callout b{color:var(--accent)}
 footer{margin-top:48px;font-size:13px;color:var(--muted);border-top:1px solid var(--line);padding-top:16px}
 </style>
 
@@ -199,6 +208,45 @@ cdx:{
   warns:['구글 메일과 드라이브를 연결하면 개인 자료를 읽게 됩니다. 승인 화면의 권한 목록을 읽고 필요한 범위만 허용하세요.','삭제는 휴지통을 거치지 않고 영구 삭제될 수 있습니다. 지우기 전에 목록을 보여 달라고 하세요.','원본이 하나뿐인 자료는 먼저 다른 드라이브에 복사해 두세요.','클라우드 실행에는 내 파일이 인터넷 환경으로 올라갑니다. 민감한 자료는 올리지 마세요.']
 },
 anti:{
+  pre:[{
+    eb:'다른 도구와 다른 점',
+    title:'Antigravity는 여러 회사의 AI를 골라 쓴다',
+    lead:'Claude Code와 Codex는 자기 회사의 AI만 씁니다. Antigravity는 구글이 만든 도구인데도 구글 모델(Gemini) 말고 다른 회사의 모델을 불러다 쓸 수 있습니다. 편집기 안에서 모델 선택 메뉴로 고릅니다.',
+    html:'<div class="tbl"><table><thead><tr><th>도구</th><th>만든 회사</th><th>쓰는 AI</th><th>비용을 내는 곳</th></tr></thead><tbody>'
+      +'<tr><th>Claude Code</th><td>Anthropic</td><td>Claude 모델만</td><td>Claude 구독(프로 등) 또는 API</td></tr>'
+      +'<tr><th>Codex</th><td>OpenAI</td><td>OpenAI 모델만</td><td>ChatGPT 구독</td></tr>'
+      +'<tr><th>Antigravity</th><td>Google</td><td class="hl">Gemini와 다른 회사 모델(Claude, 오픈 모델 등)을 선택</td><td class="hl">구글 계정. 개인은 한도가 있는 무료 이용, 구글 AI 요금제로 한도 확대</td></tr>'
+      +'</tbody></table></div>'
+      +'<div class="callout"><b>이렇게 쓰면 좋습니다.</b> 글을 다듬는 일은 Claude 계열, 구글 서비스와 이어지는 일은 Gemini처럼 작업에 맞는 모델로 바꿔 쓸 수 있고, 한 모델의 한도가 다 차면 다른 모델로 이어서 일할 수 있습니다.</div>'
+      +'<div class="callout" style="background:var(--warn-soft)"><b style="color:var(--warn)">구독은 서로 따로입니다.</b> Antigravity 안에서 Claude 모델을 골라 써도, 보통은 내 Claude 구독이 아니라 Antigravity의 이용 한도에서 쓰는 것으로 알려져 있습니다. 쓸 수 있는 모델 목록과 한도는 자주 바뀌니 설정 화면에서 직접 확인하세요.</div>'
+  }],
+  post:[{
+    eb:'할 수 있는 영역',
+    title:'Antigravity가 맡을 수 있는 일 여섯 가지',
+    lead:'코드 편집기 위에 "AI 일꾼을 부리는 화면"이 얹혀 있는 구조입니다. 프로그램을 몰라도 파일과 웹페이지를 다루는 일에 쓸 수 있습니다.',
+    html:'<div class="grid3" style="grid-template-columns:repeat(auto-fit,minmax(240px,1fr))">'
+      +'<div class="card"><h3>편집기</h3><p>VS Code와 비슷한 화면에서 파일을 열고, AI가 바꾼 부분을 줄 단위로 확인하고, 내가 직접 고치기도 합니다.</p></div>'
+      +'<div class="card"><h3>매니저 화면</h3><p>여러 에이전트에게 일을 나눠 주고 진행 상황을 한 화면에서 봅니다. 서로 다른 일을 동시에 시킬 수 있습니다.</p></div>'
+      +'<div class="card"><h3>터미널 실행</h3><p>설치, 실행, 테스트, 깃 명령을 대신 입력합니다. 실행 전에 내 승인을 받도록 정할 수 있습니다.</p></div>'
+      +'<div class="card"><h3>브라우저 에이전트</h3><p>크롬 확장을 설치하면 AI가 웹페이지를 열고 누르고 입력하며, 만든 페이지가 실제로 동작하는지 직접 확인합니다.</p></div>'
+      +'<div class="card"><h3>결과물 기록(아티팩트)</h3><p>계획서, 할 일 목록, 화면 캡처, 작업 녹화가 남아 AI가 무엇을 했는지 눈으로 검수할 수 있습니다.</p></div>'
+      +'<div class="card"><h3>규칙과 워크플로</h3><p>자주 쓰는 지침과 작업 순서를 파일로 저장해 둡니다. Claude의 CLAUDE.md와 같은 역할입니다.</p></div>'
+      +'</div>'
+  },{
+    eb:'내 작업으로 보기',
+    title:'오늘 한 작업을 Antigravity에서 한다면',
+    lead:'오늘 교육 페이지 만들기는 Claude Code에서 진행했습니다. 같은 일을 Antigravity에서 한다면 이렇게 나뉩니다.',
+    html:'<div class="tbl"><table><thead><tr><th>오늘 한 일</th><th>Antigravity에서는</th></tr></thead><tbody>'
+      +'<tr><th>교육 페이지 6개 만들기</th><td>폴더를 열고 "이 양식으로 새 페이지를 만들어 줘"라고 하면 계획서를 먼저 쓰고, 편집기에서 변경된 파일을 확인합니다.</td></tr>'
+      +'<tr><th>만든 페이지가 잘 동작하는지 확인<br><small>(오늘은 사이드바 접기 버튼을 직접 눌러 보지 못함)</small></th><td class="hl">브라우저 에이전트가 페이지를 열어 버튼을 눌러 보고 캡처나 녹화로 증명합니다. 오늘 비어 있던 확인 단계를 가장 잘 메워 주는 부분입니다.</td></tr>'
+      +'<tr><th>설명 글과 구글 연동 설명을 각각 쓰기</th><td>글 설명은 Claude 계열, 구글 서비스 설명은 Gemini처럼 모델 선택 메뉴로 바꿔 가며 맡깁니다.</td></tr>'
+      +'<tr><th>깃허브 저장소 만들고 올리기</th><td>터미널에서 깃 명령을 실행합니다. 정책을 "매번 검토 요청"으로 두면 명령 하나하나를 확인하고 승인합니다. 공개 저장소를 만드는 단계는 꼭 직접 승인하세요.</td></tr>'
+      +'<tr><th>유튜브 영상 자막 읽고 분석</th><td>자막을 내려받는 스크립트는 터미널로 실행하고, 요약과 분석은 선택한 모델이 합니다.</td></tr>'
+      +'<tr><th>페이지 수정과 목차 작업을 같이 진행</th><td>매니저 화면에서 에이전트 둘에게 따로 맡겨 병렬로 진행하고, 각자 만든 결과물을 비교해 승인합니다.</td></tr>'
+      +'<tr><th>결과 주소를 텔레그램으로 보내기</th><td>이미 만들어 둔 알림 스크립트를 터미널에서 실행합니다. 봇 토큰이 화면이나 기록에 남지 않도록 주의하세요.</td></tr>'
+      +'</tbody></table></div>'
+      +'<div class="callout"><b>정리하면</b> Antigravity는 "여러 AI를 갈아 끼우며, 만든 것을 브라우저로 직접 확인하게 하는 작업실"입니다. 글과 문서 중심의 일은 Claude Code나 Codex로도 충분하지만, 웹페이지를 만들고 눈으로 검증하는 일에서 차이가 납니다.</div>'
+  }],
   title:'Antigravity: AI 일꾼들을 지휘하는 작업실',
   lead:'Antigravity는 구글의 AI 개발 작업 환경입니다. 코드 편집기에 더해, 여러 AI 에이전트에게 일을 나눠 맡기고 진행 상황을 한 화면에서 볼 수 있습니다. 구글 계정으로 시작합니다.',
   reach:[
@@ -228,6 +276,12 @@ anti:{
   warns:['브라우저 에이전트에게 비밀번호, 카드번호, 은행 화면을 맡기지 마세요.','웹페이지 안에 숨은 지시문이 AI를 속일 수 있습니다. 모르는 사이트는 읽기만 시키세요.','터미널 자동 실행을 켜면 삭제 명령도 실행될 수 있습니다. 중요한 폴더에서는 켜지 마세요.','실험적 도구라서 기능과 한도가 자주 바뀝니다. 중요한 작업 전에 백업부터 하세요.']
 }};
 
+function extra(list){
+  if(!list)return '';
+  return list.map(function(b){
+    return '<section><div class="eyebrow">'+b.eb+'</div><h2>'+b.title+'</h2>'+(b.lead?'<p class="lead">'+b.lead+'</p>':'')+b.html+'</section>';
+  }).join('');
+}
 function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;')}
 function render(who){
   var d=DATA[who],h='';
@@ -235,12 +289,14 @@ function render(who){
   h+='<div class="grid3" style="grid-template-columns:repeat(auto-fit,minmax(200px,1fr))">';
   d.reach.forEach(function(r){h+='<div class="card">'+ico(r[0])+'<h3>'+r[1]+'</h3><p>'+r[2]+'</p></div>'});
   h+='</div></section>';
+  h+=extra(d.pre);
   h+='<section><h2>시작은 세 단계</h2><div class="grid3">';
   d.steps.forEach(function(s,i){h+='<div class="card"><span class="n">'+(i+1)+'</span><h3>'+s[0]+'</h3><p>'+s[1]+'</p></div>'});
   h+='</div></section>';
   h+='<section><h2>이런 요청부터 해 보세요</h2><p class="lead">모두 읽기나 계획 위주라 처음 시도해도 안전한 요청입니다. 복사해서 고쳐 쓰세요.</p><div class="feats">';
   d.ex.forEach(function(f,i){h+='<div class="feat"><h3>'+f[0]+'</h3><p>'+f[1]+'</p><div class="ex"><small>요청 예시</small><span id="ex-'+who+i+'">'+esc(f[2])+'</span><br><button class="copy" data-t="ex-'+who+i+'">복사</button></div></div>'});
   h+='</div></section>';
+  h+=extra(d.post);
   h+='<section><h2>권한 단계: 얼마나 맡길까</h2><p class="lead">AI에게 주는 자유도가 클수록 편하지만 사고도 커집니다.</p><div class="ladder">';
   d.ladder.forEach(function(l){h+='<div class="rung"><b>'+l[0]+'</b><span>'+l[1]+'</span><span class="pill '+l[3]+'">'+l[2]+'</span></div>'});
   h+='</div></section>';
